@@ -140,6 +140,31 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
+        /* --- PULSANTE ALL PROJECTS (NUOVO) --- */
+        .all-projects-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--mac-text);
+            background: transparent;
+            color: var(--mac-text);
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .all-projects-btn:hover {
+            background: var(--mac-text);
+            color: #000;
+            box-shadow: 0 0 10px rgba(51,255,51,0.4);
+        }
+
         /* --- HERO --- */
         .hero-wrapper { 
             display: flex; 
@@ -526,6 +551,131 @@
         </div>
     </div>
 
+    <!-- MODAL ALL PROJECTS -->
+    <div id="all-projects-modal" class="modal-overlay">
+        <div class="modal-window" style="height: 70vh;">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="all-projects-close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title">Full_Archive.exe</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="all-projects-close-text">[x] close</span>
+                </div>
+                <h3 style="font-family: var(--font-ui); color: var(--mac-dim); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">> SYSTEM ARCHIVE</h3>
+                
+                <!-- LISTA PROGETTI ARCHIVIO -->
+                <ul class="file-list">
+
+                  <li class="hover-trigger" data-index="200">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Audiovisual Live-Set for APOPHENIA FESTIVAL - 2023</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="201">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Fluid Node - A-Lumiere - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="202">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>EU-SAT - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="203">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Rhizomatic Mutual Jam - SMC2021 - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="204">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>BitNet Laptop Ensemble - Opening Act to Richard Devine - 2019</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="205">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>PoseNetOSC</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="206">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>OSCNet01</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="207">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Mode - Resonator filters bank (Max4live)</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="208">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Aether - meta-granular synthesizer with gesture control</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="209">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Nube - Texture Synthesizer (Max4live)</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="210">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>AS29 Studio - software</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="211">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Tropical Additive Synthesis</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+                  <!-- Puoi aggiungere altri progetti qui duplicando il blocco <li> sopra -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUOVO MODAL ARCHIVE PROJECT (SPECIFICO PER OLD_ARCHIVE) -->
+    <!-- Nota: z-index 150 per garantirne la priorità -->
+    <div id="archive-project-modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="archive-project-close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title">Archive_Entry</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="archive-project-close-text">[x] close</span>
+                </div>
+                <div class="project-header">
+                    <div>
+                        <h1 class="project-title" id="archive-project-title">PROJECT_NAME</h1>
+                        <div class="project-meta" id="archive-project-meta">> TYPE: MUSIC // YEAR: 2023</div>
+                        <p class="project-desc" id="archive-project-desc">Project description goes here...</p>
+                    </div>
+                </div>
+                <div id="archive-gallery-content"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL HISTORY (MAC WINDOW) -->
     <div id="history-modal" class="modal-overlay">
         <div class="modal-window">
@@ -579,12 +729,12 @@
                     <div class="history-year-title">2024</div>
                     <div class="past-event-item">
                         <span class="past-date">2024-10-02</span>
-                        <span class="past-title">What if we Kissed in the latent space? - AI Tragedy</span>
+                        <span class="past-title">What if we Kissed in latent space? - AI Tragedy</span>
                         <span class="past-venue">MUMUTH Kunstuniversität - Graz, Austria</span>
                     </div>
                      <div class="past-event-item">
                         <span class="past-date">2024-09-06/13</span>
-                        <span class="past-title">What if we Kissed in the latent space? - AI Tragedy</span>
+                        <span class="past-title">What if we Kissed in latent space? - AI Tragedy</span>
                         <span class="past-venue">esc medien kunst labor - Graz, Austria</span>
                     </div>
 
@@ -801,8 +951,21 @@
                 <li class="hover-trigger" data-index="1"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Border - AV Installation</span><span class="meta">2025</span></li>
                 <li class="hover-trigger" data-index="2"><span class="icon"><i class="fa-solid fa-music"></i></span><span>CMKK V x SMC2025 - Live-set</span><span class="meta">2025</span></li>
                 <li class="hover-trigger" data-index="3"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>What if we kissed in the latent space? - AV Installation</span><span class="meta">2024</span></li>
+                <li class="hover-trigger" data-index="4">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Live-Set for Ultrablack non-ference of Mille Plateux - 2023</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+                    <li class="hover-trigger" data-index="5">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>CHAOSM - Live at IEM CUBE - 2023</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
                 <li class="hover-trigger" data-index="4"><span class="icon"><i class="fa-solid fa-code"></i></span><span>KlownWave - VST Synthesizer</span><span class="meta">2022</span></li>
             </ul>
+            
+            <!-- PULSANTE ALL PROJECTS -->
+            <button id="btn-all-projects" class="all-projects-btn">ALL PROJECTS</button>
         </section>
 
         <!-- Sezione About -->
@@ -872,7 +1035,8 @@
         document.addEventListener("DOMContentLoaded", () => setTimeout(typeWriter, 1000));
 
         // --- DATI PROGETTI ---
-        const projectsData = [
+        // Cambiato 'const' a 'let' per permettere l'aggiunta dinamica all'indice 100
+        let projectsData = [
         
             { 
                 title: "NOW AND THEN @ ELEVATE FESTIVAL", 
@@ -896,7 +1060,7 @@
                 title: "CMKK V x SMC2025",
                 type: "Live-set", 
                 year: "10/072025", 
-                desc: "> <a href='https://smc25.iem.sh/sessions/off-smc/' style='color:var(--mac-text); text-decoration:underline;'>Link to the program </a><br> <br>The 5th iteration of the CMKK nights has taken place in Dom Im Berg. It is a very special collaboration together with SMC25 and the Institute for Sonic Welfare (IfSW). <br><br> All acts are using number 5 as their reference: 5 channels, 5 sound sources, algorithms guided by number 5 and so on. <br> <br> IfSW Nerd Nights Spatial Sound Events is a project to test, develop and promote spatial sound art by supporting young and established professionals, both locally and internationally, in the exploration and creation of new experimental music. The invited artists develop and perform site-specific compositions/live performances in the Dom im Berg with the support of the cultural association Institute for Sonic Welfare.", 
+                desc: "> <a href='https://smc25.iem.sh/sessions/off-smc/' style='color:var(--mac-text); text-decoration:underline;'>Link to program </a><br> <br>The 5th iteration of CMKK nights has taken place in Dom Im Berg. It is a very special collaboration together with SMC25 and Institute for Sonic Welfare (IfSW). <br><br> All acts are using number 5 as their reference: 5 channels, 5 sound sources, algorithms guided by number 5 and so on. <br> <br> IfSW Nerd Nights Spatial Sound Events is a project to test, develop and promote spatial sound art by supporting young and established professionals, both locally and internationally, in the exploration and creation of new experimental music. The invited artists develop and perform site-specific compositions/live performances in Dom im Berg with the support of the cultural association Institute for Sonic Welfare.", 
                 videoIds:["aEaAQFWhVxY"] ,
                 hasVideo: true, 
                 images: ["art1", "art2", "art3","art4"] 
@@ -905,21 +1069,143 @@
                 title: "What if we kissed in the latent space?", 
                 type: "INSTALLATION", 
                 year: "2024", 
-                desc: "> 𝕎ℍ𝔸𝕋 𝕀𝔽 𝕎𝔼 𝕂𝕀𝕊𝕊𝔼𝔻 𝕀ℕ 𝕋ℍ𝔼 𝕃𝔸𝕋𝔼ℕ𝕋 𝕊ℙ𝔸ℂ𝔼? <br><br>An interactive installation that explores the concept of latent space: a compressed, abstract representation of data in machine learning, where potential outcomes coexist without a definitive result. The installation delves into this perpetual state of possibility and transformation, challenging our expectations of finality.<br><br>Inspired by the idea that latent space is a domain of infinite potential rather than finite outcomes, the work reflects the relentless pursuit of desires in human life, where fulfillment is fleeting and new desires constantly emerge in a chaotic manner, morphing into one another without ever arriving at a definitive outcome.<br><br>The title playfully references the meme “What if we kissed in…”, humorously suggesting a shared intimate moment in unconventional places. It invites viewers to a strange and intimate exploration of an abstract, multidimensional computational realm.<br><br>The auditory and visual contents are generated with AI tools, such as StableDiffusion and IRCAM Rave<br><br><br>Inside the exhibition AI TRAGEDY: ESC Medien Kunst Labor - Graz (6-13/09/2024) / MUMUTH Kunstuniversität Graz (02/10/2024)", 
+                desc: "> 𝕎ℍ𝔸𝕥 𝕀𝔽 𝕎𝔼 𝕂𝕀𝕊𝕊𝔼𝔻 𝕀ℕ 𝕋ℍ𝔼 𝕃𝔸𝕋𝔼ℕ𝕋 𝕊ℙ𝔸ℂ𝔼? <br><br>An interactive installation that explores the concept of latent space: a compressed, abstract representation of data in machine learning, where potential outcomes coexist without a definitive result. The installation delves into this perpetual state of possibility and transformation, challenging our expectations of finality.<br><br>Inspired by the idea that latent space is a domain of infinite potential rather than finite outcomes, the work reflects the relentless pursuit of desires in human life, where fulfillment is fleeting and new desires constantly emerge in a chaotic manner, morphing into one another without ever arriving at a definitive outcome.<br><br>The title playfully references the meme “What if we kissed in…”, humorously suggesting a shared intimate moment in unconventional places. It invites viewers to a strange and intimate exploration of an abstract, multidimensional computational realm.<br><br>The auditory and visual contents are generated with AI tools, such as StableDiffusion and IRCAM Rave<br><br><br>Inside the exhibition AI TRAGEDY: ESC Medien Kunst Labor - Graz (6-13/09/2024) / MUMUTH Kunstuniversität Graz (02/10/2024)", 
                 videoIds: ["__YWMKfpuhk", "8ju_7pJS0HI"], 
                 
+            },
+            {
+              title: "Live-Set for Ultrablack non-ference of Mille Plateux",
+              type: "AUDIO_VISUAL",
+              year: "2023",
+              desc: `> Played live at Forum Stadtpark in Graz 27/10/23<br><br><b>Description:</b><br>Ultrablackness is a determining force. The outside folding in. Background noise of the thermodynamic disequilibrium. An indifferent un_groundedness, opaque like a heterogeneous mixture or transparent like see-through fluids. Not to be differentiated, but the 0 that defines 1.<br><br>Ultrablackness therefore is not to be confused with the void - emptyness -, but is intrinsically messy. That which messes with the attempt to define, to limit, and territorialize, a dæmonic force subverting the godly order, defying the One-God-Universe. Black noise, unlike the searing buzz of white noise, is barely audible. Black noise traces the quiver of things we fail to perceive.<br><br>Our uchromia: to learn to think from the point of view of Black as what determines color in the last instance rather than what limits it.`,
+              soundcloudUrl: "https://soundcloud.com/utopixxel/liveset-for-ultrablack-non-ference-of-mille-plateux-forum-stadpark",
+              images: ["ultra1","ultra2", "ultra3"]
+            },
+            {
+              title: "CHAOSM - Live at IEM CUBE - 30/01/23 (Binaural)",
+              type: "AUDIO_VISUAL",
+              year: "2023",
+              desc: `> Played live at IEM CUBE in Graz 30/01/23 in 5th order ambisonics, this version is decoded in binaural.<br><br><b>Description:</b><br>Chaos is not a generic and indeterminate mass of matter, but a constantly changing dimension where the speed of the emergence of new determinations leaves no space for the formation of constant elements over time. What defines CHAOSM is a constellation of a-rhytmic patterns and digital errors that moves around the room, a meaningless assemblage of endless sonic perspectives.`,
+              soundcloudUrl: "https://soundcloud.com/utopixxel/chaosm-live-at-iem-cube-300123-binaural",
+
             },
             {
              title: "KLOWNWAVE", 
              type: "VST/AU Plugin Synth", 
              year: "2022", 
-             desc: "> AU / VST Plugin synth written in Csound and Cabbage  - <a href='https://github.com/cipp0/KlownWave' style='color:var(--mac-text); text-decoration:underline;'>GitHube Repo</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_KlownWave_macOS.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Apple (Universal)</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_Klownwave_Windows.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Windows</a> <br><br>In this long period of pandemic, for about two years now, we have tried to commit our efforts, for something truly stimulating and of which we have always been passionate, and this is how, thanks to the collaboration between KernelPanikSound and the BitNet01 collective, we have been able to develop in this time, our virtual synthesizer, VST, with our style and sound timbre that we have called KLOWNWAVE.<br><br>We are excited to introduce this new project to you, and we hope you will share our visionary initiative. KlownWave it's distributed to the public 'by donation', it's open source and hackable<br><br>Features:<br>2 x Wavetable Oscillators<br>6 x Wavetable Set with 16 morphable waves each<br>2 x Analog-like Oscillators (Saw-Ramp-Triangle)<br>2 x FM module with morphable source (between different harmonics in sine waves)<br>1 x White Noise<br>1 x Filter module with envelope and types:<br>TB303-like lowpass filter with resonance<br>Moog-like lowpass filter with resonance<br>Steiner-Parker lowpass filter with resonance<br>Steiner-Parker highpass filter with resonance<br>Steiner-Parker bandpass filter with resonance<br><br> This work is licensed under a GNU GENERAL PUBLIC LICENSE<br>Developed by cipp0 (BitNet01) from an idea of Kernel Panik Sound", 
+             desc: "> AU / VST Plugin synth written in Csound and Cabbage  - <a href='https://github.com/cipp0/KlownWave' style='color:var(--mac-text); text-decoration:underline;'>GitHube Repo</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_KlownWave_macOS.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Apple (Universal)</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_Klownwave_Windows.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Windows</a> <br><br>In this long period of pandemic, for about two years now, we have tried to commit our efforts, for something truly stimulating and of which we have always been passionate, and this is how, thanks to the collaboration between KernelPanikSound and BitNet01 collective, we have been able to develop in this time, our virtual synthesizer, VST, with our style and sound timbre that we have called KLOWNWAVE.<br><br>We are excited to introduce this new project to you, and we hope you will share our visionary initiative. KlownWave it's distributed to the public 'by donation', it's open source and hackable<br><br>Features:<br>2 x Wavetable Oscillators<br>6 x Wavetable Set with 16 morphable waves each<br>2 x Analog-like Oscillators (Saw-Ramp-Triangle)<br>2 x FM module with morphable source (between different harmonics in sine waves)<br>1 x White Noise<br>1 x Filter module with envelope and types:<br>TB303-like lowpass filter with resonance<br>Moog-like lowpass filter with resonance<br>Steiner-Parker lowpass filter with resonance<br>Steiner-Parker highpass filter with resonance<br>Steiner-Parker bandpass filter with resonance<br><br> This work is licensed under a GNU GENERAL PUBLIC LICENSE<br>Developed by cipp0 (BitNet01) from an idea of Kernel Panik Sound", 
              hasVideo: true, 
              videoIds:["GsDrJaLyziQ"],
              images: ["inst1", "inst2", "inst3", "inst4", "inst5", "inst6"] 
-         },
+         }
             
         ];
+
+        // Inserimento forzato dei dati dell'archivio all'indice 100
+     projectsData[200] = {
+           title: "Audiovisual Live-Set for APOPHENIA FESTIVAL",
+          type: "AUDIO_VISUAL",
+          year: "2023",
+          desc: `> Played live at Cinema Politeama in Fano 07/12/23<br><br><b>Description:</b>“Apophenia: tendenza a percepire connessioni significanti tra cose non correlate.” Il caos comunicativo che regola la nostra vita quotidiana è rappresentato da infinite sequenze in cui notizie di guerra e scenari apocalittici si alternano a Meme e Reels divertenti. Il rumore comunicativo ovviamente non è una novità nella nostra contemporaneità, ma ciò non cambia il fatto che sia ancora un criterio di riferimento importante per comprendere i gradi di sviluppo e diffusione dell'economia dell’attenzione.<br><br>Il caos non è un insieme generico e indeterminato di materia, ma una dimensione costantemente mutevole in cui la velocità con cui emergono nuove determinazioni non lascia spazio alla formazione di elementi costanti nel tempo. L'arte produce cambiamenti, trasformando la modulazione perpetua del caos in un movimento creativo a livello percettivo.<br><br>Che si tratti di lottare contro il rumore comunicativo, sospendere il meccanismo stimolo-ricompensa derivante dalla mercificazione di ogni aspetto della vita o sabotare la predazione antropica, la delimitazione di uno spazio di resistenza passa attraverso un confronto con il rumore creando un contro-rumore.<br><br>L’Apophenia Festival, organizzato dal collettivo BitNet01 vuole costruire, ospitando il collettivo milanese Otolab, Spazio Ge.Ge di Pesaro e la TKD family, uno spazio collettivo per dare forma al contro-rumore, uno spazio di performance audiovisive, installazioni multimediali, workshop e DJ-sets, all’interno della cornice dello storico Cinema Politeama, alla soglia dei suoi 100 anni di attività, e all’Officina Amaranta sede dell’APS Urobòros Amaranto.`,
+          videoIds: ["oLg3PW9RNBU"],
+        };
+
+        projectsData[201] = {
+          title: "Fluid Node - A-Lumiere",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> Live Electronics performance @ Teatro della Fortuna - Fano (Italy)<br><br>A-Lumiere is an experimental duo formed by Matteo Tomasetti and Francesco Casanova<br><br><b>Description:</b><br>"The amount of binary information produced in the anthropocene can be represented as a multiform fluid in continuous evolution. A liquid 'chaosm' led by creatures from the deepest abyss with metal heads and fiber optic tentacles that carry the immateriality of our existence. The Fluid-node performance aims to represent a sound representation of individual precarious existences that flounder immersed in a historical moment characterized by environmental disasters and global pandemics. Investigating space, time, gestures and the sound landscape through the information technology medium."`,
+          videoIds: ["XWxFRCGw9-U"],
+          soundcloudUrl: "",
+          images: []
+        };
+
+        projectsData[202] = {
+          title: "EU-SAT",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> WebVR online installation selected for the New York City Electroacoustic Music Festival (NYCEMF 2021)<br><br><b>Description:</b><br>This installation / composition aims to be a symbiosis between what is beyond the sky and what we feel on earth. Inspired by "Serenata per un satellite" by Bruno Maderna where we find the elements of a futuristic avant-garde made of experimentation and the dream of space The algorithm parameters are controlled by calculating the SGP trajectories obtained through NASA's TLE, creating an ensemble of seven satellites: ISS, Kestrel, Tempest-D, Cuberrt, Dellingr, Ubakusat and Halosat(...).<br><br>The trajectories of the satellite's orbits are calculated in the future. The data of the future transform and change the sound material in the present, creating a dialectic between what will be and what is. This work is conceived as an open work in continuous evolution.<br><br>It wants to recall an imaginary of a utopia where technology can shape the future according to the needs of everyone in the present, imagining a symbiosis between all natural elements such as the human, the non-human, the earth and space.<br><br><a href='https://www.bitnet01.xyz/EUSAT/' style='color:var(--mac-text); text-decoration:underline;'><b>Demo</b></a>`,
+          videoIds: [],
+          soundcloudUrl: "",
+          images: ["vr1"]
+        };
+
+        projectsData[203] = {
+          title: "Rhizomatic Mutual Jam - SMC2021",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> Networked music performance between Rome and Turin<br><br> Work selected for the live music program of the Sound and Music Computing Conference (SMC 2021) with Giorgio Alloatti, Andrea Reali, Federico Briata and Matteo Tomasetti<br><br><b>Description:</b><br>We are experiencing a reality that until a few months ago we could only trace in some sci-fi movies. The body becomes obsolete, our lives enter a purely cognitive dimension. Networking means creating relationship networks, sharing experiences and ideas, creating(...)contexts to communicate and create artistically so that the artists and public get confused and lose their original meaning.<br><br>The term rhizomatic derives from rhizome which in botany is a particular type of root where any point is connected to any other point in a non-hierarchical way: there is no center, no direction, only concatenations. In philosophy Gilles Deleuze and Felix Guattari place the concept of rhizome at the center of a widespread organizational model capable of describing and changing social and cultural processes.<br><br>For this purpose we have set up two NINJAM servers. NINJAM is a Client/Server software that allows you to play synchronized via the Internet. Any participant can listen to any other participant. Users can also edit his own personal mix as they wish. Since the inherent latency of the Internet prevents true real time synchronization of the jam and playing with latencies of tens of milliseconds is in fact impossible, NINJAM provides a solution by making latency (and the weirdness) much longer.<br><br>Latency in NINJAM is measured in measures, and that's what makes it interesting.`,
+          videoIds: ["E1nn0v9bNiI"],
+        };
+
+        projectsData[204] = {
+          title: "BitNet Laptop Ensemble - Opening Act to Richard Devine",
+          type: "AUDIO_VISUAL",
+          year: "2019",
+          desc: `> The Bitnet Laptop Ensemble is made up of 6 performers and 6 laptops. Shapes, images, synthetic materials, noises, melodic and rhythmic gestures alternate the scene to take the listener to remote digital places. BLE mainly uses programming languages such as Max / Msp, C-Sound, Touch Designer as the primary platform for sound / video synthesis / analysis and software such as Ableton Live for live realization.<br><br>The BLE is: Francesco Casanova, Matteo Tomasetti, Filippo Gualazzi, Gianluca Stefanelli, Luis Braschi and Federico Turchi.`,
+          soundcloudUrl: "https://soundcloud.com/bitnet01/ble-opening-act-to-richard-devine",
+          images: ["ble1"]
+        };
+
+        // ================= SOFTWARE =================
+
+        projectsData[205] = {
+          title: "PoseNetOSC",
+          type: "SOFTWARE",
+          year: "2023",
+          desc: `> Using ML5's PoseNet implementation to track 17 keypoints of the body of a single person using the webcam. These keypoints are then sent via OSC directly to a Max/MSP patch.<br><br><a href='https://github.com/cipp0/PoseNetOSC' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b></a>`,
+          images: ["posenet1"]
+        };
+
+        projectsData[206] = {
+          title: "OSCNet01",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Client for broadcasting of OSC messages via WAN divided into groups (MacOS only)<br>A Project based on Ross Bencina's C++ OSCGroup Library<br><br><a href='https://github.com/cipp0/OSCnet' style='color:var(--mac-text); text-decoration:underline;'>  <b>Repository:</b> </a>`,
+          images: ["osc1"]
+        };
+
+        projectsData[207] = {
+          title: "Mode - Resonator filters bank (Max4live)",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Clone of Mutable Instruments' Rings module. This free MaxForLive device is based on vb.mi.rngs~ OSX external by Volker Böhm, whom I thank so much for porting the original code of Émilie Gillet to Max-MSP.<br><br><a href='https://github.com/cipp0/Mode-Rings' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b></a>`,
+          images: ["mode1"]
+        };
+
+        projectsData[208] = {
+          title: "Aether - meta-granular synthesizer with gesture control",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Live electronics patch that features a microtonal/random arpeggiator from 1 to 32 steps, an oscillator with basic waveforms (sine wave, triangle wave, square wave and white noise) with a MIDI keyboard control to select the center frequency, an envelope to model the sound produced by the oscillator, a real-time sampling granulator, a series of filters with the type of decay and quantity chosen by the user, an audio mixer to control the streams of the various channels, a reverb with various parameters implemented, a gesture control, based on the webcam where the user can change the parameters of the granulator.`,
+          videoIds: ["UKawpZqUd2w"],
+          images: ["aether1"]
+        };
+
+        projectsData[209] = {
+          title: "Nube - Texture Synthesizer (Max4live)",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> Clone of the 'Clouds' module by Mutable Instruments. This free MaxForLive device was made using the "vb.mi.clds~" OSX external by Volker Böhm, whom I thank so much for porting the original code of Émilie Gillet to Max-MSP.<br><br><a href='https://github.com/cipp0/Nube_Texture_Synth' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b> </a>`,
+          videoIds: ["2g5ej1LG5L4"],
+          images: ["nube1"]
+        };
+
+        projectsData[210] = {
+          title: "AS29 Studio - software",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> The AS29 system is a new studio monitor speaker system with different multichannel configurations from 2.1 to 7.1.4.<br><br>AS29 is a premium product entirely made in Italy supplied with a software application for Windows and Mac OSX necessary to control and access the countless functions available: AS29 Studio.<br><br><b>Links:</b><br><a href='https://www.audiofactory.it' style='color:var(--mac-text); text-decoration:underline;'>Audiofactory</a><br><a href='https://www.as29studiomonitor.com' style='color:var(--mac-text); text-decoration:underline;'>AS29 Studio Monitor</a>`,
+          images: ["as291"]
+        };
+
+        projectsData[211] = {
+          title: "Tropical Additive Synthesis",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> Additive synthesizer using tropical algebra in CsoundQT based on the work of Giorgio Sancristoforo and Cristiano Bocci.<br><br>Additive synthesis equations are transformed using tropical addition (⊕) and tropical multiplication (⊗). The algorithm uses: a⊕b := min{a,b} ; a⊗b := a+b<br><br><a href='https://github.com/cipp0/TropicalAdditiveSynth' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b> </a>`,
+          images: ["tropi1"]
+        };
 
         // --- BOOT SEQUENCE ---
         const bootScreen = document.getElementById('boot-sequence');
@@ -943,7 +1229,7 @@
         }
         runBootSequence();
 
-        // --- PROJECT MODAL LOGIC (MODIFICATO) ---
+        // --- PROJECT MODAL LOGIC (MAIN SELECTED PROJECTS) ---
         const modal = document.getElementById('project-modal');
         const closeBtn = document.getElementById('modal-close');
         const closeText = document.getElementById('modal-close-text');
@@ -952,7 +1238,7 @@
         const mDesc = document.getElementById('modal-project-desc');
         const mGallery = document.getElementById('modal-gallery-content');
 
-                function openProject(index) {
+        function openProject(index) {
             const data = projectsData[index];
             mTitle.textContent = data.title;
             mMeta.textContent = `> TYPE: ${data.type} // YEAR: ${data.year} // ID: #${1000+index}`;
@@ -963,7 +1249,6 @@
             galleryWrapper.className = 'gallery-grid';
 
             // --- LOGICA YOUTUBE (MULTIPLA) ---
-            // Ho cambiato data.videoId in data.videoIds e aggiunto il ciclo forEach
             if (data.videoIds && data.videoIds.length > 0) {
                 data.videoIds.forEach(id => {
                     const vidDiv = document.createElement('div');
@@ -973,7 +1258,7 @@
                 });
             } 
             
-            // --- LOGICA SOUNDCLOUD (SINGOLA - Se volessi multipla applica lo stesso principio sopra) ---
+            // --- LOGICA SOUNDCLOUD ---
             else if (data.soundcloudUrl) {
                 const scDiv = document.createElement('div');
                 scDiv.className = "gallery-item full-width-media";
@@ -981,7 +1266,7 @@
                 galleryWrapper.appendChild(scDiv);
             }
 
-            // --- LOGICA IMMAGINI (GRID 2 COLONNE DESKTOP + CLICCABILI) ---
+            // --- LOGICA IMMAGINI ---
             if (data.images) {
                 const projectId = parseInt(index) + 1;
                 
@@ -992,7 +1277,6 @@
                     const imageNum = i + 1;
                     const imagePath = `./media/projects/${projectId}/${imageNum}.jpg`;
                     
-                    // Immagine avvolta in link cliccabile
                     imgDiv.innerHTML = `<h3>> IMAGE_PREVIEW_0${imageNum}.jpg</h3><a href="${imagePath}" target="_blank" class="img-link-wrapper" title="Open Image"><img src="${imagePath}"></a>`;
                     
                     galleryWrapper.appendChild(imgDiv);
@@ -1005,17 +1289,114 @@
 
         function closeModal() { modal.classList.remove('active'); }
 
+        // Listener globale per TUTTI gli elementi li con classe file-list
         document.querySelectorAll('.file-list li').forEach(li => {
             li.addEventListener('click', (e) => {
-                if(li.parentElement.classList.contains('file-list') && !li.querySelector('a')) {
-                    const index = li.getAttribute('data-index');
-                    if(index !== null) openProject(parseInt(index));
+                // Fermo la propagazione per evitare conflitti strani
+                e.stopPropagation();
+
+                // Se l'elemento cliccato è dentro un link <a>, non aprire il modal
+                if(li.querySelector('a')) return;
+                
+                const index = li.getAttribute('data-index');
+                if(index !== null) {
+                    // Se stiamo aprendo un progetto dalla modale All Projects, chiudi prima la modale All Projects
+                    if(document.getElementById('all-projects-modal').classList.contains('active')) {
+                         document.getElementById('all-projects-modal').classList.remove('active');
+                    }
+
+                    // Controlla se è l'archivio (100) o un progetto selezionato
+                    if(index == "100") {
+                        openArchiveProject(100);
+                    } else {
+                        openProject(parseInt(index));
+                    }
                 }
             });
         });
+
         closeBtn.addEventListener('click', closeModal);
         closeText.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+
+        // --- ARCHIVE PROJECT MODAL LOGIC (NEW) ---
+        const archiveModal = document.getElementById('archive-project-modal');
+        const archiveCloseBtn = document.getElementById('archive-project-close');
+        const archiveCloseText = document.getElementById('archive-project-close-text');
+        const aTitle = document.getElementById('archive-project-title');
+        const aMeta = document.getElementById('archive-project-meta');
+        const aDesc = document.getElementById('archive-project-desc');
+        const aGallery = document.getElementById('archive-gallery-content');
+
+        function openArchiveProject(index) {
+            const data = projectsData[index];
+            aTitle.textContent = data.title;
+            aMeta.textContent = `> TYPE: ${data.type} // YEAR: ${data.year} // ID: #ARCHIVE_${index}`;
+            aDesc.innerHTML = data.desc; 
+            aGallery.innerHTML = ""; 
+            
+            const galleryWrapper = document.createElement('div');
+            galleryWrapper.className = 'gallery-grid';
+
+            // Logica semplificata per l'archivio
+            if (data.videoIds && data.videoIds.length > 0) {
+                data.videoIds.forEach(id => {
+                    const vidDiv = document.createElement('div');
+                    vidDiv.className = "gallery-item full-width-media";
+                    vidDiv.innerHTML = `<h3>> VIDEO_PREVIEW.mp4</h3><iframe style="height: 450px;" src="https://www.youtube.com/embed/${id}?controls=0" frameborder="0" allowfullscreen></iframe>`;
+                    galleryWrapper.appendChild(vidDiv);
+                });
+            } 
+
+            if (data.images) {
+                const projectId = parseInt(index) + 1;
+                
+                data.images.forEach((imgName, i) => {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = "gallery-item grid-image";
+                    
+                    const imageNum = i + 1;
+                    // Se è l'index di esempio 100, usa una path diversa per non rompere il layout
+                    let imagePath = (index == 100) ? `./media/projects/1/${imageNum}.jpg` : `./media/projects/${projectId}/${imageNum}.jpg`;
+                    
+                    imgDiv.innerHTML = `<h3>> IMAGE_PREVIEW_0${imageNum}.jpg</h3><a href="${imagePath}" target="_blank" class="img-link-wrapper" title="Open Image"><img src="${imagePath}"></a>`;
+                    
+                    galleryWrapper.appendChild(imgDiv);
+                });
+            }
+            
+            aGallery.appendChild(galleryWrapper);
+            archiveModal.classList.add('active');
+        }
+
+        function closeArchiveModal() {
+            archiveModal.classList.remove('active');
+        }
+
+        // Listener per chiudere il modale Archivio
+        archiveCloseBtn.addEventListener('click', closeArchiveModal);
+        archiveCloseText.addEventListener('click', closeArchiveModal);
+        archiveModal.addEventListener('click', (e) => { if (e.target === archiveModal) closeArchiveModal(); });
+
+        // --- ALL PROJECTS MODAL LOGIC ---
+        const allProjectsBtn = document.getElementById('btn-all-projects');
+        const allProjectsModal = document.getElementById('all-projects-modal');
+        const allProjectsCloseBtn = document.getElementById('all-projects-close');
+        const allProjectsCloseText = document.getElementById('all-projects-close-text');
+
+        allProjectsBtn.addEventListener('click', () => {
+            allProjectsModal.classList.add('active');
+        });
+
+        function closeAllProjectsModal() {
+            allProjectsModal.classList.remove('active');
+        }
+
+        allProjectsCloseBtn.addEventListener('click', closeAllProjectsModal);
+        allProjectsCloseText.addEventListener('click', closeAllProjectsModal);
+        allProjectsModal.addEventListener('click', (e) => { if (e.target === allProjectsModal) closeAllProjectsModal(); });
+
 
         // --- HISTORY MODAL LOGIC ---
         const historyModal = document.getElementById('history-modal');
@@ -1050,7 +1431,7 @@
 
         document.querySelectorAll('.hover-trigger').forEach(el => {
             el.addEventListener('click', (e) => {
-                if(el.tagName === 'A' || el.id === 'open-history-btn') return;
+                if(el.tagName === 'A' || el.id === 'open-history-btn' || el.id === 'btn-all-projects') return;
                 const originalBg = window.getComputedStyle(el).backgroundColor;
                 el.style.backgroundColor = '#33ff33';
                 el.style.color = '#000000';
