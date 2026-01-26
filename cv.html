@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cipp0_ // CV</title>
+    
+    <!-- CARICAMENTO FONT E ICONE -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- VARIABILI CSS --- */
+        :root {
+            --bg-color: #000000;
+            --term-green: #33ff33;
+            --term-dim: #888888;
+            --term-gray: #2d2d2d;
+            --term-border: #333333;
+            
+            --font-term: 'Menlo', 'Monaco', 'Courier New', monospace;
+            --font-ui: 'Space Mono', monospace;
+        }
+
+        /* --- RESET E BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--term-green);
+            font-family: var(--font-term);
+            font-size: 16px;
+            line-height: 1.5;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* --- CONTAINER CENTRATO --- */
+        .cv-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid var(--term-border);
+            background: rgba(20, 20, 20, 0.9); 
+            padding: 40px 30px;
+            margin-bottom: 60px; 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- TITOLI SEZIONI --- */
+        h2 {
+            font-size: 1rem;
+            color: #fff; /* Titoli bianchi */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        /* --- LISTE (ESPERIENZA EDUCAZIONE) --- */
+        .cv-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cv-list li {
+            display: flex;
+            flex-wrap: wrap; /* Permette a capo su mobile */
+            justify-content: space-between;
+            align-items: flex-start; /* Allineamento top per i blocchi */
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-left: 2px solid var(--term-green); /* Linea verde laterale */
+            transition: background 0.2s;
+        }
+
+        .cv-list li:hover {
+            background: rgba(51, 255, 51, 0.05);
+        }
+
+        .item-main {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .item-main .title {
+            font-size: 1.1rem;
+            color: #fff; /* Titoli progetti bianchi */
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .item-main .subtitle {
+            font-size: 0.9rem;
+            color: #bbb; /* Sottotitoli grigi */
+            font-family: var(--font-ui);
+            font-weight: normal;
+        }
+
+        .item-date-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Anno a sinistra, link a destra */
+            gap: 15px;
+            width: 100%;
+            margin-top: 8px; /* Spaziatura dall'elemento */
+        }
+
+        .year {
+            color: #fff; /* Anno bianco */
+            font-weight: bold;
+            font-family: var(--font-ui);
+        }
+        
+        .separator {
+            color: #444; /* Barra separatrice grigia */
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+
+        .external-link {
+            color: var(--term-green);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .external-link:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid var(--term-green); /* Bordo verde accentato */
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(51, 255, 51, 0.1);
+        }
+
+        .profile-info h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info .role {
+            font-family: var(--font-ui);
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* --- SKILLS --- */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--term-border);
+            padding: 5px 10px;
+            font-family: var(--font-ui);
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--term-green);
+            color: #fff;
+        }
+
+        /* --- FOOTER E NAVIGATION --- */
+        .cv-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--term-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-ui);
+            font-size: 0.8rem;
+            color: var(--term-dim);
+            gap: 30px;
+        }
+
+        .back-link {
+            color: #888; /* Link grigio in footer */
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 600px) {
+            .cv-list li {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .item-date-container {
+                justify-content: flex-start; /* Su mobile allineamento a sinistra */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cv-container">
+        
+        <!-- HERO / INFO GENERALI -->
+        <section class="hero">
+        
+            <div class="profile-info">
+                <h1>cipp0_</h1>
+                <span class="role">Sound Artist // Developer // Interaction Designer</span>
+                
+                <!-- BIO BIANCO SU SFONDO NERO -->
+                <div style="color: #fff; max-width: 600px; line-height: 1.5;">
+                    Born in Bologna (IT), currently resident in Graz (AT), I'm active in the fields of music, visuals and software development. My research spans several aspects of sound design, human-computer interaction, multi-channel technologies and interactive installations. I have a keen interest in design and realization of electroacoustic devices, multi-platform software controllers/tools and production of sounds using anything from programming languages to welding machines. <br><br>
+                    Some of my works were presented at Sound and Music Computing Conference(SMC2025), Elevate Festival 2025, Fusion Festival 2025, Sound and Music Computing Conference(SMC2021), New York City Electroacoustic Music Festival (NYCEMF 2021) and others
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS (SPOSTA HERO) -->
+        <section>
+            <h2>Skills & Tools</h2>
+            <div class="skills-container">
+                <span class="skill-tag">Max/MSP</span>
+                <span class="skill-tag">Csound / Cabbage</span>
+                <span class="skill-tag">Three.js / WebGL</span>
+                <span class="skill-tag">HTML5 / CSS3</span>
+                <span class="skill-tag">Arduino / Electronics</span>
+                <span class="skill-tag">Live Visuals</span>
+                <span class="skill-tag">Spatial Audio</span>
+                <span class="skill-tag">Sound Design</span>
+            </div>
+        </section>
+
+        <!-- ESPERIENZA / SELECTED WORKS -->
+        <h2>Selected Works</h2>
+        <ul class="cv-list">
+            <!-- ITEM 1: CHAOSM -->
+            <li>
+                <div class="item-main">
+                    <span class="title">CHAOSM - Electroacoustic composition executed live at IEM CUBE - Graz (Austria)</span>
+                    <span class="subtitle">Live electronics // Ambisonic</span>
+                    <!-- Contenitore data allineamento -->
+                 
+                    <!-- Link -->
+                    <a href="https://soundcloud.com/utopixxel/chaosm-live-at-iem-cube-300123-binaural" target="_blank" class="external-link">
+                        <i class="fa-solid fa-play-circle"></i>
+                        <span>Soundcloud</span>
+                    </a>
+                </div>
+            </li>
+
+            <!-- ITEM 2: LATENT SPACE -->
+            <li>
+                <div class="item-main">
+                    <span class="title">What if we kissed in latent space? Interactive AudioVisual installation showcased at ESC Medien Kunst Labor and Gyorg Ligeti-Saal MUMUTH - Graz</span>
+                    <span class="subtitle">Interactive Installation</span>
+                    
+                   
+                    <a href="https://www.youtube.com/watch?v=__YWMKfpuhk" target="_blank" class="external-link">
+                        <i class="fa-brands fa-youtube"></i>
+                        <span>Watch Video</span>
+                    </a>
+                </div>
+            </li>
+
+            <!-- ITEM 3: FEEDBACK DRONE -->
+            <li>
+                <div class="item-main">
+                    <span class="title">Feedback drone set played at Sound and Music Computing Conference 2025 - Dom Im Berg (Graz)</span>
+                    <span class="subtitle">Live Electronics // Ambisonic</span>
+                    
+                    
+                    <a href="https://youtu.be/aEaAQFWhVxY" target="_blank" class="external-link">
+                        <i class="fa-brands fa-youtube"></i>
+                        <span>Watch Video</span>
+                    </a>
+                </div>
+            </li>
+
+            <!-- ITEM 4: A-LUMIERE -->
+            <li>
+                <div class="item-main">
+                    <span class="title">A-LUMIERE (Francesco Casanova & Matteo Tomasetti) - "Fluid-node"</span>
+                    <span class="subtitle">Live Electronics performance</span>
+                    
+                  
+                    <a href="https://youtu.be/XWxFRCGw9-U" target="_blank" class="external-link">
+                        <i class="fa-brands fa-youtube"></i>
+                        <span>Watch Video</span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+
+        <!-- FORMAZIONE -->
+        <h2>Education</h2>
+        <ul class="cv-list">
+            
+            <!-- ITEM 1: G. ROSSINI -->
+            <li>
+                <div class="item-main">
+                    <span class="title">BA - “Electronic Music and Sound Design” at “G. Rossini” Conservatory of Pesaro</span>
+                    <span class="subtitle">Bachelor of Arts (Music)</span>
+                    
+                    <div class="item-date-container">
+                         <span class="year">2014 — 2018</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ITEM 2: ROMA TOR VERGATA -->
+            <li>
+                <div class="item-main">
+                    <span class="title">First level Master in "Sound Design and Music Composition for Cinema and Videogame" at University of Rome Tor Vergata </span>
+                    <span class="subtitle">Master of Arts (Music)</span>
+                    
+                    <div class="item-date-container">
+                         <span class="year">2020 — 2021</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ITEM 3: KUG (KUNST) -->
+            <li>
+                <div class="item-main">
+                    <span class="title">MA - Masterstudium Computermusik und Klangkunst - Kunst Universitat Graz </span>
+                    <span class="subtitle">Master of Arts</span>
+                    
+                    <div class="item-date-container">
+                         <span class="year">2024 - on going</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        
+
+    </div>
+</body>
+</html>
