@@ -980,6 +980,7 @@
             <div class="section-title">Selected Projects</div>
             <ul class="file-list">
                 <!-- BORDER (Primo, con testo formattato) -->
+                <li class="hover-trigger" data-index="8"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Leap into the Unknown @ musikprotokoll - AV Installation</span><span class="meta">2026</span></li>
                 <li class="hover-trigger" data-index="0"><span class="icon"><i class="fa-solid fa-music"></i></span> <span>Disappearing - ICMC2026 Selected multichannel composition </span> <span class="meta">2026</span></li>
                 <li class="hover-trigger" data-index="1"><span class="icon"><i class="fa-solid fa-music"></i></span><span>Now and then @ Elevate Festival - Live-set</span><span class="meta">2025</span></li>
                 <li class="hover-trigger" data-index="2"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Border - AV Installation</span><span class="meta">2025</span></li>
@@ -1134,9 +1135,24 @@ As we worked within the palace, the building itself became an active presence: r
              desc: "> AU / VST Plugin synth written in Csound and Cabbage  - <a href='https://github.com/cipp0/KlownWave' style='color:var(--mac-text); text-decoration:underline;'>GitHube Repo</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_KlownWave_macOS.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Apple (Universal)</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_Klownwave_Windows.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Windows</a> <br><br>In this long period of pandemic, for about two years now, we have tried to commit our efforts, for something truly stimulating and of which we have always been passionate, and this is how, thanks to the collaboration between KernelPanikSound and BitNet01 collective, we have been able to develop in this time, our virtual synthesizer, VST, with our style and sound timbre that we have called KLOWNWAVE.<br><br>We are excited to introduce this new project to you, and we hope you will share our visionary initiative. KlownWave it's distributed to the public 'by donation', it's open source and hackable<br><br>Features:<br>2 x Wavetable Oscillators<br>6 x Wavetable Set with 16 morphable waves each<br>2 x Analog-like Oscillators (Saw-Ramp-Triangle)<br>2 x FM module with morphable source (between different harmonics in sine waves)<br>1 x White Noise<br>1 x Filter module with envelope and types:<br>TB303-like lowpass filter with resonance<br>Moog-like lowpass filter with resonance<br>Steiner-Parker lowpass filter with resonance<br>Steiner-Parker highpass filter with resonance<br>Steiner-Parker bandpass filter with resonance<br><br> This work is licensed under a GNU GENERAL PUBLIC LICENSE<br>Developed by cipp0 (BitNet01) from an idea of Kernel Panik Sound", 
              hasVideo: true, 
              videoIds:["GsDrJaLyziQ"],
-             images: ["inst1", "inst2", "inst3", "inst4", "inst5", "inst6"] 
-         }
-            
+             images: ["inst1", "inst2", "inst3", "inst4", "inst5", "inst6"]
+         },
+            {
+              title: "LEAP INTO THE UNKNOWN",
+              type: "AV Installation",
+              year: "2026",
+              desc: `> Audiovisual installation by Francesco Casanova and Lain Iwakura. World premiere at ORF musikprotokoll 2026 (Supernova), Graz.<br><br>
+Binarity breaks – both/and/neither. Worlds-without-ground. Unknown unknowns. CERN tunnel. Insurgent streets. History buffer. Meme theories. A social machine for undetermined life.<br><br>
+Quantum physics dissolves certainty into probabilities, and reality itself becomes inseparably bound to the informational limits through which it is experienced.<br><br>
+Non-philosophy withdraws from philosophy its grip on ultimate grounds. A philosophy dreamed by the Real.<br><br>
+Uprisings produce time-spaces in which existing social orders lose their inevitability, suspend the given distribution of the possible and, for a moment, let incompatible futures breathe together.<br><br>
+<i>Leap into the Unknown</i> gathers these unstable materials without resolving them. Thought, matter and collective action overwrite one another without origin or permission. The feed becomes a field where particles remember, propaganda dreams, archives hallucinate and failed visions of the future refuse to go extinct. Every intervention edits reality and at the same time corrupts its source code.<br><br>
+Leap – transition into an (N)ontology in which indeterminacy is constitutive. Future as interference, before history knows its name.<br><br>
+<b>Materials:</b> voices of Harrison Prosper, François Laruelle, Karl-Heinz Dellwo, Gabriele Rollnik, <i>One Piece</i>, Peter Weiss <i>Die Ästhetik des Widerstands</i> (BR), Lizzie Borden <i>Born in Flames</i>, Ulrike Meinhof <i>Bambule</i>, Elio Petri <i>La classe operaia va in paradiso</i>, <i>TATORT</i> (ARD), Nikel Pallat <i>Ende offen</i> (WDR), Sergio Zavoli <i>La notte della Repubblica</i> (RAI), Jack Hazan, David Mingay <i>Rude Boy</i>, found footage and more. Recordings at CERN and CERN Audiovisual Media.<br><br>
+Photo credits: © ORF musikprotokoll / M. Gross`,
+              images: ["1","2","3","4","5","6","7","8","9","10","full"]
+            }
+
         ];
 
         // Inserimento forzato dei dati dell'archivio all'indice 100
@@ -1354,7 +1370,8 @@ As we worked within the palace, the building itself became an active presence: r
 
         data.images.forEach((imgName, i) => {
             const imgDiv = document.createElement('div');
-            imgDiv.className = "gallery-item grid-image";
+            // "full" = a tutta larghezza, senza ritaglio quadrato
+            imgDiv.className = imgName === "full" ? "gallery-item full-width-media" : "gallery-item grid-image";
 
             const imageNum = i + 1;
             const imagePath = `./media/projects/${projectId}/${imageNum}.jpg`;
