@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cipp0_ // Francesco Casanova</title>
+    
+    <!-- CARICAMENTO FONT E ICONE -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- THREE.JS LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+
+    <style>
+        /* --- VARIABILI CSS (COLORI E FONT) --- */
+        :root {
+            --mac-bg: #1e1e1e;       /* Sfondo finestra grigio scuro */
+            --mac-header: #2d2d2d;  /* Sfondo intestazione */
+            --mac-text: #33ff33;    /* Verde Terminale */
+            --mac-dim: #888888;     /* Testo smorzato */
+            --font-term: 'Menlo', 'Monaco', 'Courier New', monospace; /* Font monospazio stile Mac */
+            --font-ui: 'Space Mono', monospace; /* Font secondario */
+        }
+
+        /* Reset base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* --- SFONDO PAGINA (NERO PURO) --- */
+        body {
+            background-color: #000000;
+            font-family: var(--font-term);
+            color: var(--mac-text);
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* --- CONTENITORE CANVAS 3D --- */
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Dietro tutto il contenuto */
+            pointer-events: auto; /* Permette rotazione col mouse */
+        }
+
+        /* --- SPEAKER ICON BUTTON (TOP RIGHT) --- */
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            z-index: 200;
+            color: #333;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.2s;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .music-toggle:hover {
+            color: var(--mac-text);
+            transform: scale(1.1);
+            border-color: var(--mac-text);
+        }
+        
+        .music-toggle.active {
+            color: var(--mac-text);
+            border-color: var(--mac-text);
+            box-shadow: 0 0 15px rgba(51, 255, 51, 0.3);
+        }
+
+        /* --- SEQUENZA DI AVVIO (BOOT SCREEN) --- */
+        #boot-sequence {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: black;
+            color: var(--mac-text);
+            z-index: 9999;
+            padding: 40px;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+
+        /* --- CONTENITORE PRINCIPALE --- */
+        #main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.85); 
+            padding: 20px 30px;
+            min-height: 90vh;
+            position: relative;
+            z-index: 10;
+        }
+        
+        #main-content::-webkit-scrollbar { width: 8px; }
+        #main-content::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+        /* --- EFFETTI TESTO --- */
+        .highlight-box { 
+            background: var(--mac-text); color: #000; 
+            padding: 0 8px; border-radius: 4px; font-weight: bold; 
+            display: inline-block; min-width: 10px;
+        }
+        
+        .cursor-block { 
+            display: inline-block; width: 10px; height: 1.2em; 
+            background: #000000; 
+            animation: blink 1s step-end infinite; 
+            vertical-align: middle; margin-left: 2px; 
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- MENU DI NAVIGAZIONE --- */
+        .nav-bar { 
+            display: flex; gap: 30px; margin-bottom: 40px; 
+            font-family: var(--font-ui); font-size: 0.8rem; text-transform: uppercase; 
+            border-bottom: 1px solid #333; padding-bottom: 10px; 
+        }
+        .nav-item { 
+            color: #ccc; text-decoration: none; 
+            cursor: pointer; transition: color 0.2s; 
+        }
+        .nav-item:hover, .nav-item.active { color: var(--mac-text); }
+
+        /* --- CONTENITORI GENERALI --- */
+        .section { margin-bottom: 50px; padding-top: 20px; cursor: default; } 
+        .section-title { 
+            font-family: var(--font-ui); font-size: 0.75rem; text-transform: uppercase; 
+            color: var(--mac-dim); margin-bottom: 15px; letter-spacing: 1px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* --- PULSANTE ALL PROJECTS (NUOVO) --- */
+        .all-projects-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--mac-text);
+            background: transparent;
+            color: var(--mac-text);
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .all-projects-btn:hover {
+            background: var(--mac-text);
+            color: #000;
+            box-shadow: 0 0 10px rgba(51,255,51,0.4);
+        }
+
+        /* --- HERO --- */
+        .hero-wrapper { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2px; 
+        }
+        .hero-text { flex: 1; }
+
+        /* --- HERO IMAGE (DESKTOP DEFAULT) --- */
+        .hero-image-wrapper {
+            flex: 0 0 auto;
+            margin-left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-image-wrapper img {
+            max-height: 240px; 
+            max-width: 100%;
+            width: auto;
+            display: block;
+        }
+
+        /* --- STILE H1 DI DEFAULT (DESKTOP) --- */
+        .hero-text h1 {
+            font-size: 2.7rem; 
+            line-height: 1.0;
+            font-weight: normal;
+        }
+
+        /* --- HERO LOGOS --- */
+        .hero-logos { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            align-items: flex-end; 
+            justify-content: center;
+            padding-right: 20px;
+        }
+        
+        .logo-link { 
+            display: block; 
+            transition: opacity 0.3s, transform 0.2s; 
+            padding: 5px;
+        }
+        .logo-link:hover { 
+            opacity: 1; 
+            transform: scale(1.1); 
+        }
+        
+        .logo-link img {
+            max-height: 35px; 
+            width: auto; 
+            display: block;
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 8px rgba(51, 255, 51, 0.4));
+        }
+
+        .hero-logos-title {
+            font-family: var(--font-ui); 
+            font-size: 0.7rem; 
+            color: var(--mac-dim); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-top: 0;
+            padding-right: 10px;
+        }
+
+        /* --- LISTA PROGETTI --- */
+        .file-list { 
+            list-style: none; font-family: var(--font-ui); font-size: 0.9rem; 
+            background: #151515; border-radius: 8px; border: 1px solid #333; overflow: hidden; 
+        }
+        .file-list li { 
+            display: flex; align-items: center; padding: 12px 20px; 
+            border-bottom: 1px solid #252525; cursor: pointer; transition: background 0.2s; 
+        }
+        .file-list li:last-child { border-bottom: none; }
+        .file-list li:hover { background: #252525; }
+        .icon { width: 24px; margin-right: 15px; text-align: center; color: #555; font-size: 1rem; }
+        .meta { margin-left: auto; color: #555; font-size: 0.8rem; }
+
+        /* --- TABELLA AGENDA --- */
+        .agenda-table { 
+            width: 100%; border-collapse: collapse; font-family: var(--font-ui); 
+            font-size: 0.9rem; color: #ccc; 
+        }
+        .agenda-table td { padding: 12px 0; border-bottom: 1px solid #333; }
+        .agenda-table tr:hover td { color: var(--mac-text); } 
+        .date { color: var(--mac-text); width: 120px; font-weight: bold; }
+
+        .open-history-btn {
+            font-family: var(--font-ui); font-size: 0.75rem;
+            color: var(--mac-dim); text-decoration: underline; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .open-history-btn:hover { color: var(--mac-text); }
+
+        /* --- SEZIONE CONTATTI --- */
+        .contact-link { 
+            text-decoration: underline;
+            color: var(--mac-text);
+            display: flex; align-items: center; 
+            padding: 12px 20px; border-bottom: 1px solid #252525; transition: all 0.2s; 
+        }
+        .contact-link:visited { color: var(--mac-text); text-decoration: underline; }
+        .contact-link:hover { background: rgba(51, 255, 51, 0.1); }
+
+        .icon-link { 
+            color: var(--mac-text);
+        }
+        .icon-link:visited { color: var(--mac-text); text-decoration: underline; }
+        .icon-link:hover { background: rgba(51, 255, 51, 0.1); }
+
+        /* --- FOOTER --- */
+        .footer-status { 
+            border-top: 1px solid #333; margin-top: 40px; padding-top: 15px; 
+            display: flex; justify-content: space-between; font-family: var(--font-ui); 
+            font-size: 0.75rem; color: #555; text-transform: uppercase; 
+        }
+
+        /* --- MODALE GENERICA --- */
+        .modal-overlay {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); 
+            z-index: 100;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(8px); 
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-window {
+            width: 85vw; height: 85vh; 
+            background: var(--mac-bg); border-radius: 12px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 60px rgba(51, 255, 51, 0.15);
+            transform: scale(0.9); transition: transform 0.3s ease;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        .modal-overlay.active .modal-window { transform: scale(1); }
+
+        .window-header { 
+            background: var(--mac-header); height: 38px; 
+            display: flex; align-items: center; padding: 0 15px; 
+            border-bottom: 1px solid rgba(0,0,0,0.2); flex-shrink: 0;
+        }
+        .traffic-lights { display: flex; gap: 8px; }
+        .traffic-lights span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; cursor: pointer; }
+        .close { background: #ff5f56; border: 1px solid #e0443e; }
+        .minimize { background: #ffbd2e; border: 1px solid #dea123; }
+        .maximize { background: #27c93f; border: 1px solid #1aab29; }
+        .window-title { flex-grow: 1; text-align: center; color: #999; font-size: 0.8rem; font-weight: 600; padding-right: 52px; }
+
+        .modal-body { flex: 1; overflow-y: auto; padding: 30px; }
+        
+        .project-header { margin-bottom: 20px; border-bottom: 1px dashed #333; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .close-text {
+            font-family: var(--font-ui); color: var(--mac-text); cursor: pointer;
+            font-size: 0.9rem; text-decoration: underline; user-select: none;
+        }
+        .close-text:hover { color: #fff; }
+
+        .project-title { font-size: 2rem; margin-bottom: 10px; color: var(--mac-text); text-transform: uppercase; }
+        .project-meta { color: #666; font-family: var(--font-ui); font-size: 0.85rem; margin-bottom: 15px; }
+        
+        .project-desc { 
+            color: #ccc; font-family: var(--font-ui); 
+            font-size: 0.95rem; line-height: 1.6; 
+            width: 100%; margin-bottom: 30px; 
+            white-space: pre-wrap; 
+        }
+        
+        .project-desc a { color: var(--mac-text); text-decoration: underline; }
+        .project-desc a:hover { background: rgba(51,255,51,0.1); }
+
+        /* --- STILI GALLERY (MODIFICATI PER DESKTOP) --- */
+        
+        /* Container principale per la griglia */
+        .gallery-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .gallery-item { 
+            margin-bottom: 0; /* Margin gestito dal gap della griglia */
+        }
+        
+        .gallery-item h3 { 
+            font-size: 0.8rem; color: #666; margin-bottom: 8px; 
+            font-family: var(--font-ui); text-transform: uppercase; letter-spacing:1px; 
+        }
+
+        /* Stili generici per iframe e img */
+        .gallery-item iframe, .gallery-item img { 
+            width: 100%; border-radius: 6px; border: 1px solid #333; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); display: block;
+        }
+        
+        /* Link wrapper per le immagini cliccabili */
+        .img-link-wrapper {
+            display: block;
+            position: relative;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+        }
+        .img-link-wrapper:hover {
+            transform: scale(1.02);
+            border-color: var(--mac-text);
+        }
+
+        /* --- DESKTOP SPECIFIC (> 768px) --- */
+        @media (min-width: 769px) {
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2 Colonne */
+                align-items: start;
+                gap: 20px;
+            }
+
+            /* Video e Soundcloud occupano tutta la larghezza (2 colonne) */
+            .gallery-item.full-width-media {
+                grid-column: span 2;
+                margin-bottom: 0;
+            }
+
+            /* Le immagini occupano 1 colonna ciascuna */
+            .gallery-item.grid-image {
+                grid-column: span 1;
+            }
+
+            /* --- MODIFICHE ANTEPRIMA QUADRATA --- */
+            /* Immagini nella griglia: ANTEPRIMA QUADRATA */
+            .gallery-item.grid-image img {
+                width: 100%;
+                aspect-ratio: 1 / 1; /* Forza il rapporto 1:1 (Quadrato) */
+                object-fit: cover;    /* Ritaglia l'immagine per riempire il quadrato */
+            }
+        }
+
+
+        /* --- STILI LISTA STORICO --- */
+        .history-year-group { margin-bottom: 40px; border-left: 2px solid #333; padding-left: 20px; }
+        .history-year-title {
+            font-family: var(--font-ui); font-size: 1.5rem; color: var(--mac-text);
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .past-event-item { margin-bottom: 25px; font-family: var(--font-ui); color: #aaa; padding-left: 10px; border-left: 1px solid #444; transition: border-color 0.2s; }
+        .past-event-item:hover { border-left-color: var(--mac-text); }
+        .past-date { color: var(--mac-dim); font-size: 0.8rem; margin-bottom: 5px; display: block; }
+        .past-title { color: #e0e0e0; font-size: 1rem; display: block; margin-bottom: 3px; }
+        .past-venue { font-size: 0.8rem; color: #666; margin-top: 3px; }
+
+        /* --- LINK BIO --- */
+        #about-text a { color: var(--mac-text); text-decoration: underline; }
+        #about-text a:visited { color: var(--mac-text); }
+        #about-text a:hover { background: rgba(51, 255, 51, 0.1); }
+
+        /* --- RESPONSIVE (MOBILE ONLY) --- */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            #main-content { 
+                width: 100vw; 
+                border-radius: 0; 
+                padding: 20px;
+                background: rgba(30, 30, 30, 0.85) !important; 
+            }
+            
+            /* HERO CONTAINER */
+            .hero-wrapper { 
+                position: relative; 
+                flex-direction: column; 
+                justify-content: flex-start; 
+                align-items: flex-start;
+                margin-bottom: -220px !important; 
+                min-height: 350px; 
+                pointer-events: none
+            }
+            
+            /* HERO TEXT */
+            .hero-text { 
+                width: 100%; 
+                position: relative;
+                z-index: 2; 
+                padding-right: 20px; 
+            }
+
+            /* HERO IMAGE */
+            .hero-image-wrapper {
+                position: absolute; 
+                right: 0; 
+                top: 0; 
+                margin-top: -140px; 
+                height: 100%; 
+                z-index: 1; 
+                pointer-events: none; 
+                align-items: center;
+                justify-content: center;
+            }
+            .hero-image-wrapper img {
+                height: 100%; 
+                max-height: 350px; 
+                width: auto;
+                object-fit: contain; 
+                opacity: 0.9; 
+            }
+
+            /* Font MOBILE */
+            .hero-text h1 {
+                font-size: 1.8rem !important; 
+                line-height: 1.2;
+                word-break: break-word; 
+            }
+            .hero-text p {
+                font-size: 0.9rem;
+            }
+
+            /* HERO LOGOS */
+            .hero-logos { 
+                align-items: flex-start; 
+                padding-left: 0; 
+                padding-right: 0;
+                flex-direction: column; 
+                width: 100%;
+                gap: 15px;
+            }
+            .hero-logos-title { width: 100%; text-align: left; margin-bottom: 10px; }
+            .logo-link img { max-height: 30px; }
+            
+            .modal-window { width: 100vw; height: 100vh; border-radius: 0; }
+            .project-header { flex-direction: column; gap: 10px; }
+            .section-title { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .music-toggle { right: 20px; font-size: 1.2rem; }
+            .history-year-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ELEMENTO CORRETTO BOOT SEQUENCE -->
+    <div id="boot-sequence"></div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="audio-sample" loop src="./re.mp3"></audio>
+
+    <!-- 3D CANVAS -->
+    <div id="canvas-container"></div>
+
+    <!-- SPEAKER ICON BUTTON -->
+    <div id="music-toggle" class="music-toggle hover-trigger">
+        <i class="fa-solid fa-volume-high"></i>
+    </div>
+
+    <!-- MODAL PROJECT (MAC WINDOW) -->
+    <div id="project-modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="modal-close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title" id="modal-title-display">Project_Details</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="modal-close-text">[x] close</span>
+                </div>
+                <div class="project-header">
+                    <div>
+                        <h1 class="project-title" id="modal-project-title">PROJECT_NAME</h1>
+                        <div class="project-meta" id="modal-project-meta">> TYPE: MUSIC // YEAR: 2023</div>
+                        <p class="project-desc" id="modal-project-desc">Project description goes here...</p>
+                    </div>
+                </div>
+                <div id="modal-gallery-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ALL PROJECTS -->
+    <div id="all-projects-modal" class="modal-overlay">
+        <div class="modal-window" style="height: 70vh;">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="all-projects-close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title">Full_Archive.exe</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="all-projects-close-text">[x] close</span>
+                </div>
+                <h3 style="font-family: var(--font-ui); color: var(--mac-dim); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">> SYSTEM ARCHIVE</h3>
+                
+                <!-- LISTA PROGETTI ARCHIVIO -->
+                <ul class="file-list">
+
+
+                  <li class="hover-trigger" data-index="200">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Audiovisual Live-Set for APOPHENIA FESTIVAL - 2023</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="201">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Fluid Node - A-Lumiere - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="202">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>EU-SAT - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="203">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Rhizomatic Mutual Jam - SMC2021 - 2021</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+                 
+
+                  <li class="hover-trigger" data-index="204">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>Metamorfosi nel tempo (AV composition)</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+                  <li class="hover-trigger" data-index="205">
+                    <span class="icon"><i class="fa-solid fa-cube"></i></span>
+                    <span>BitNet Laptop Ensemble - Opening Act to Richard Devine - 2019</span>
+                    <span class="meta">AUDIO_VISUAL</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="206">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>PoseNetOSC</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="207">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>OSCNet01</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="208">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Mode - Resonator filters bank (Max4live)</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="209">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Aether - meta-granular synthesizer with gesture control</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="210">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Nube - Texture Synthesizer (Max4live)</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="211">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>AS29 Studio - software</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+
+                  <li class="hover-trigger" data-index="212">
+                    <span class="icon"><i class="fa-solid fa-code"></i></span>
+                    <span>Tropical Additive Synthesis</span>
+                    <span class="meta">SOFTWARE</span>
+                  </li>
+                  <!-- Puoi aggiungere altri progetti qui duplicando il blocco <li> sopra -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUOVO MODAL ARCHIVE PROJECT (SPECIFICO PER OLD_ARCHIVE) -->
+    <!-- Nota: z-index 150 per garantirne la priorità -->
+    <div id="archive-project-modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="archive-project-close"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title">Archive_Entry</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="archive-project-close-text">[x] close</span>
+                </div>
+                <div class="project-header">
+                    <div>
+                        <h1 class="project-title" id="archive-project-title">PROJECT_NAME</h1>
+                        <div class="project-meta" id="archive-project-meta">> TYPE: MUSIC // YEAR: 2023</div>
+                        <p class="project-desc" id="archive-project-desc">Project description goes here...</p>
+                    </div>
+                </div>
+                <div id="archive-gallery-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORY (MAC WINDOW) -->
+    <div id="history-modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <span class="close" id="history-close-btn"></span>
+                    <span class="minimize"></span>
+                    <span class="maximize"></span>
+                </div>
+                <div class="window-title">Past_Dates_Log.txt</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <span class="close-text" id="history-close-text">[x] close</span>
+                </div>
+                
+                <!-- CONTENUTO DATE PASSATE -->
+                <!-- 2026 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2026</div>
+
+                    <div class="past-event-item">
+                        <span class="past-date">2026-06-21</span>
+                        <span class="past-title">Fantasia Festival </span>
+                        <span class="past-venue">Badia Tedalda, Italy</span>
+                    </div>
+
+                   <div class="past-event-item">
+                        <span class="past-date">2026-05-8/9/10</span>
+                        <span class="past-title">Kommunity Fayre Festival</span>
+                        <span class="past-venue">Ciudad Real, Spain</span>
+                    </div>
+
+                     <div class="past-event-item">
+                        <span class="past-date">2026-04-9/10/11</span>
+                        <span class="past-title">Welcome 2 Da Future Festival </span>
+                        <span class="past-venue">Rome, Italy </span>
+
+                    </div>
+                  
+                    
+                </div>
+
+                <!-- 2025 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2025</div>
+
+                     <div class="past-event-item">
+                        <span class="past-date">2025-11-10/20</span>
+                        <span class="past-title">Dirty Deal Audio - Immersive Music Residency</span>
+                        <span class="past-venue">Laidi, Latvia </span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2025-07-10</span>
+                        <span class="past-title">SMC2025</span>
+                        <span class="past-venue">Graz, Austria // Dom Im Berg</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2025-06-25/29</span>
+                        <span class="past-title">Fusion Festival</span>
+                        <span class="past-venue">Lärz, Germany </span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2025-04-3/4</span>
+                        <span class="past-title">Welcome 2 Da Future with KernelPanik Sound @ Forte Prenestino</span>
+                        <span class="past-venue">Roma, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2025-03-05</span>
+                        <span class="past-title">Elevate Festival - Opening act to Suzanne Ciani</span>
+                        <span class="past-venue">Graz, Austria // Dom im Berg</span>
+                    </div>
+                </div>
+
+                <!-- 2024 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2024</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-10-02</span>
+                        <span class="past-title">What if we Kissed in latent space? - AI Tragedy</span>
+                        <span class="past-venue">MUMUTH Kunstuniversität - Graz, Austria</span>
+                    </div>
+                     <div class="past-event-item">
+                        <span class="past-date">2024-09-06/13</span>
+                        <span class="past-title">What if we Kissed in latent space? - AI Tragedy</span>
+                        <span class="past-venue">esc medien kunst labor - Graz, Austria</span>
+                    </div>
+
+                    <div class="past-event-item">
+                        <span class="past-date">2024-08-09/11</span>
+                        <span class="past-title">YOH Festival</span>
+                        <span class="past-venue">Montesilvano Colle, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-07-10/12</span>
+                        <span class="past-title">Workshop Pi_mapper + Live Set @ Perseidi Suoni</span>
+                        <span class="past-venue">Sapri, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-06-26/30</span>
+                        <span class="past-title">Collaboration with Kollage Kollectiv for “Fusion Festival”</span>
+                        <span class="past-venue">Lärz, Germany</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-06-14</span>
+                        <span class="past-title">Interlude in Concert</span>
+                        <span class="past-venue">Graz, Austria // Forum Stadtpark: Dom Im Berg</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-05-31 / 06-01</span>
+                        <span class="past-title">Installations and Live-sets @ Hospiz Festival</span>
+                        <span class="past-venue">Klösterle St. Florian, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2024-04-18/19</span>
+                        <span class="past-title">Welcome 2 Da Future with KernelPanik Sound @ Forte Prenestino</span>
+                        <span class="past-venue">Roma, Italy</span>
+                    </div>
+                </div>
+
+                <!-- 2023 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2023</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-12-07/08</span>
+                        <span class="past-title">Apophenia Festival @ Cinema Politeama / Officina Amaranta</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-09-30</span>
+                        <span class="past-title">Unproxy @ Smartlab</span>
+                        <span class="past-venue">Rovereto, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-09-29</span>
+                        <span class="past-title">Live visuals for Occupy Museion Bassiani: One with the bass @ Museion</span>
+                        <span class="past-venue">Bolzano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-08-31</span>
+                        <span class="past-title">Clinamen @ Hospiz X Noitech Park</span>
+                        <span class="past-venue">Bolzano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-08-11/13</span>
+                        <span class="past-title">Installations @ YOH Festival</span>
+                        <span class="past-venue">Montesilvano Colle, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-07-14</span>
+                        <span class="past-title">Dystopic Transmission night</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-06-22</span>
+                        <span class="past-title">NerdNights Ambisonic Live-set with Lain Iwakura</span>
+                        <span class="past-venue">Graz, Austria // Dom im Berg</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-05-26/28</span>
+                        <span class="past-title">Installations and Live-sets @ Hospiz Festival</span>
+                        <span class="past-venue">Klösterle St. Florian, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2023-04-20/21</span>
+                        <span class="past-title">Welcome 2 Da Future with KernelPanik Sound @ Forte Prenestino</span>
+                        <span class="past-venue">Roma, Italy</span>
+                    </div>
+                </div>
+
+                <!-- 2022 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2022</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2022-12-18</span>
+                        <span class="past-title">C(H)AOSM - Counter noise @ SUB</span>
+                        <span class="past-venue">Graz, Austria</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2022-08-11/12, 18/19, 25/26</span>
+                        <span class="past-title">Future Space Detektion with Kollage Kollektiv @ DiskoBabel</span>
+                        <span class="past-venue">Berlin, Germany</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2022-04-07/08</span>
+                        <span class="past-title">Welcome 2 Da Future with KernelPanik Sound @ Forte Prenestino</span>
+                        <span class="past-venue">Roma, Italy</span>
+                    </div>
+                </div>
+
+                <!-- 2021 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2021</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2021-07-31 / 08-01</span>
+                        <span class="past-title">Caosmo Festival @ Spazio Autogestito Grizzly and Bastione Sangallo</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2021-06-30</span>
+                        <span class="past-title">Rhizomatic Mutual Jam @ SMC2021 with AudioHacklab</span>
+                        <span class="past-venue">Online</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2021-06-30</span>
+                        <span class="past-title">Fluid Node @ Klang</span>
+                        <span class="past-venue">Roma, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2021-06-13</span>
+                        <span class="past-title">Fluid node @ Teatro della Fortuna</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                </div>
+
+                <!-- 2020 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2020</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2020-08-09</span>
+                        <span class="past-title">Experimental electroacoustic live music @ Bastione Sangallo</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2020-04-13</span>
+                        <span class="past-title">Networked Music Performances during Corona Pandemic with AudioHackLab</span>
+                        <span class="past-venue">Online</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2020-01-17/18</span>
+                        <span class="past-title">BitNet01 Festival @ Spazio Autogestito Grizzly</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                </div>
+
+                <!-- 2019 -->
+                <div class="history-year-group">
+                    <div class="history-year-title">2019</div>
+                    <div class="past-event-item">
+                        <span class="past-date">2019-09-15</span>
+                        <span class="past-title">BitNet Laptop Ensemble opening act for Richard Devine organized by Umanesimo Artificiale @ Ex Chiesa S. Francesco</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2019-08-30</span>
+                        <span class="past-title">BitNet01 Laptop Ensemble @ Nanometri 2019</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                    <div class="past-event-item">
+                        <span class="past-date">2019-01-18/19</span>
+                        <span class="past-title">BitNet01 Festival @ Spazio Autogestito Grizzly</span>
+                        <span class="past-venue">Fano, Italy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- Menu Navigazione -->
+        <nav class="nav-bar">
+            <a href="#projects" class="nav-item active hover-trigger">Projects</a>
+            <a href="#about" class="nav-item hover-trigger">About</a>
+            <a href="#agenda" class="nav-item hover-trigger">Agenda</a>
+            <a href="#contacts" class="nav-item hover-trigger">Contacts</a>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="section hero">
+            <div style="color: #555; margin-bottom: 10px; font-size: 0.8rem; text-shadow: 2px 2px 10px #000;">Last login: Today at 13:12 on ttys000</div>
+            <div class="hero-wrapper">
+                <div class="hero-text">
+                    <h1>
+                        hello, I am <br>
+                        <span class="highlight-box">
+                            <span id="typewriter-text"></span><span class="cursor-block"></span>
+                        </span>
+                    </h1>
+                    <p style="color: #bbb; font-size: 1rem; max-width: 500px; line-height: 1.5; text-shadow: 2px 2px 10px #000;">
+                        Generating code, waveforms and pixels since 2018.
+                    </p>
+                </div>
+
+                <!-- IMMAGINE -->
+                <div class="hero-image-wrapper">
+                    <img src="./portrait.png" alt="Francesco Casanova Portrait">
+                </div>
+            </div>
+        </section>
+
+        <!-- Sezione Projects -->
+        <section class="section" id="projects">
+            <div class="section-title">Selected Projects</div>
+            <ul class="file-list">
+                <!-- BORDER (Primo, con testo formattato) -->
+                <li class="hover-trigger" data-index="8"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Leap into the Unknown @ musikprotokoll - AV Installation</span><span class="meta">2026</span></li>
+                <li class="hover-trigger" data-index="0"><span class="icon"><i class="fa-solid fa-music"></i></span> <span>Disappearing - ICMC2026 Selected multichannel composition </span> <span class="meta">2026</span></li>
+                <li class="hover-trigger" data-index="1"><span class="icon"><i class="fa-solid fa-music"></i></span><span>Now and then @ Elevate Festival - Live-set</span><span class="meta">2025</span></li>
+                <li class="hover-trigger" data-index="2"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Border - AV Installation</span><span class="meta">2025</span></li>
+                <li class="hover-trigger" data-index="3"><span class="icon"><i class="fa-solid fa-music"></i></span><span>CMKK V x SMC2025 - Live-set</span><span class="meta">2025</span></li>
+                <li class="hover-trigger" data-index="4"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>What if we kissed in the latent space? - AV Installation</span><span class="meta">2024</span></li>
+                <li class="hover-trigger" data-index="5"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>Live-Set for Ultrablack non-ference of Mille Plateux - 2023</span><span class="meta">AUDIO_VISUAL</span></li>
+                <li class="hover-trigger" data-index="6"><span class="icon"><i class="fa-solid fa-cube"></i></span><span>CHAOSM - Live at IEM CUBE - 2023</span><span class="meta">AUDIO_VISUAL</span></li>
+                <li class="hover-trigger" data-index="7"><span class="icon"><i class="fa-solid fa-code"></i></span><span>KlownWave - VST Synthesizer</span><span class="meta">2022</span></li>
+            </ul>
+            
+            <!-- PULSANTE ALL PROJECTS -->
+            <button id="btn-all-projects" class="all-projects-btn">ALL PROJECTS</button>
+        </section>
+
+        <!-- Sezione About -->
+        <section class="section" id="about">
+            <div class="section-title">About / Bio</div>
+            <p id="about-text" style="font-family: var(--font-ui); font-size: 0.95rem; color: #ccc; line-height: 1.6;">
+                <b>Francesco Casanova (he/him) :</b><br><br>
+                Born in Bologna (IT), currently living in Vienna (AT), I'm active in field of music, visuals and software development. My research spans several aspects of sound design, human-computer interaction, multi-channel technologies and interactive installations. I have a keen interest in design and realization of electroacoustic devices, multi-platform software controllers/tools and production of sounds using anything from programming languages to welding machines. 
+                <br><br>
+                I am one of the founders of <a href="https://cmkkiem.github.io/">CMKK</a>, an autonomous student-driven community rooted in the study and practice of Computer Music and Sound Art at IEM in Graz, and one of the founders of <a href="https://www.bitnet01.xyz/">BitNet01</a>, a multidisciplinary art collective that blends visual art and electronic music, organising festivals as spaces for radical experimentation.<br><br> Some of my works were presented at International Computer Music Conference (ICMC2026), Sound and Music Computing Conference(SMC2025), Elevate Festival 2025, Fusion Festival 2025, Sound and Music Computing Conference(SMC2021), New York City Electroacoustic Music Festival (NYCEMF 2021),  Cica Museum (Gimpo - South Korea) and others
+            </p>
+        </section>
+
+        <!-- Sezione Agenda (Date aggiornate) -->
+        <section class="section" id="agenda">
+            <div class="section-title">
+                <span>Agenda / Upcoming Shows</span>
+                <span id="open-history-btn" class="open-history-btn">[click for history]</span>
+            </div>
+            <table class="agenda-table">
+                <tr><td class="date">9-12 DEC</td><td>mur.at worklab x Netzfest '26 // Graz (Austria) </td><td style="text-align: right; color: #555;"><a href="https://nekula.mur.at/nf26/" class="icon-link"><i class="fa-solid fa-ticket"></i></a></td></tr>
+            </table>
+        </section>
+
+        <!-- Sezione Contatti -->
+        <section class="section" id="contacts">
+            <div class="section-title">Contacts / Network</div>
+            <div class="file-list">
+                <a href="https://github.com/cipp0/" class="contact-link hover-trigger"><span class="icon"><i class="fa-brands fa-github"></i></span><span>github.com/cipp0</span></a>
+                <a href="https://instagram.com/cipp0_" class="contact-link hover-trigger"><span class="icon"><i class="fa-brands fa-instagram"></i></span><span>instagram.com/cipp0_</span></a>
+                <a href="https://soundcloud.com/utopixxel" class="contact-link hover-trigger"><span class="icon"><i class="fa-brands fa-soundcloud"></i></span><span>soundcloud.com/utopixxel</span></a>
+                <a href="https://utopixel.bandcamp.com" class="contact-link hover-trigger"><span class="icon"><i class="fa-brands fa-bandcamp"></i></span><span>utopixel.bandcamp.com</span></a>
+                <a href="https://www.youtube.com/@francescocasanova1269" class="contact-link hover-trigger"><span class="icon"><i class="fa-brands fa-youtube"></i></span><span>youtube.com/cipp0</span></a>
+
+                <a href="mailto:casanova@mur.at" class="contact-link hover-trigger"><span class="icon"><i class="fa-solid fa-envelope"></i></span><span>ping casanova@mur.at</span></a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-status">
+            <span>STATUS: ONLINE</span>
+            <span>SESSION: 42</span>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        /* =========================================
+           PART 1: TERMINALE UI & MODALS
+           ========================================= */
+        
+        // --- TYPEWRITER ---
+        const typeTextElement = document.getElementById("typewriter-text");
+        const words = ["cipp0_", "UTPXL", "Francesco Casanova"];
+        let wordIndex = 0, charIndex = 0, isDeleting = false;
+        function typeWriter() {
+            const currentWord = words[wordIndex];
+            if (isDeleting) typeTextElement.textContent = currentWord.substring(0, charIndex - 1), charIndex--;
+            else typeTextElement.textContent = currentWord.substring(0, charIndex + 1), charIndex++;
+            let typeSpeed = isDeleting ? 50 : 100;
+            if (!isDeleting && charIndex === currentWord.length) { isDeleting = true; typeSpeed = 2000; } 
+            else if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; typeSpeed = 500; }
+            setTimeout(typeWriter, typeSpeed);
+        }
+        document.addEventListener("DOMContentLoaded", () => setTimeout(typeWriter, 1000));
+
+        // --- DATI PROGETTI ---
+        // Cambiato 'const' a 'let' per permettere l'aggiunta dinamica all'indice 100
+        let projectsData = [
+        
+            {
+    title: "DISAPPEARING",
+    type: "ICMC2026 - Selected multihcannel composition",
+    year: "2026",
+    desc: `> Spatial composition by Francesco Casanova, Matteo Tomasetti, Andrea Veneri, Vili Pääkkö and Andrea Strata. Selected by the International Computer Music Conference 2026 in Hamburg (Germany) <br><br>
+
+Disappearing is a five-minds spatial composition created during an artistic residency at Laidi Palace, a historic palace in Latvia. The architecture, the atmosphere, and the sense of time suspended within its walls inspired us to imagine a space where presence and absence constantly shift. The piece explores the idea of appearing and disappearing; sounds, gestures, and trajectories emerging briefly before dissolving again into the environment.<br><br>
+
+As we worked within the palace, the building itself became an active presence: rooms, corridors, and reverberant spaces shaped the work as much as our intentions did. The piece reflects this dialogue with the place, blurring the boundaries between visibility and invisibility. Disappearing is an attempt to capture a fragile state of being, where moments surface, fade, and leave only traces behind.<br><br>
+
+<a href="https://icmc2026.ligeti-zentrum.de/event/listening-room-1-5/" style="color:var(--mac-text);text-decoration:underline;">ICMC2026 – Listening Room</a>
+<a href="https://www.instagram.com/p/DX9oe3UDcYq/embed" style="color:var(--mac-text);text-decoration:underline;">Instagram</a>`,
+    images: ["1", "2", "3","4","5","6"]
+},
+            { 
+                title: "NOW AND THEN @ ELEVATE FESTIVAL", 
+                type: "Live-set ", 
+                year: "06/03/2025", 
+                desc: "> A live set conceived as a sonic translation of a reflection on time, memory, and artificial intelligence.Word, synthetic voice, and electronic sound merge into a performative device that turns theory into acoustic matter.<br><br>Time is staged as a cultural construction: not a historical line, but an expanded present, a compression of past and future into a single perceptual duration.Club culture as a time machine, the party as a unit of measure of experience.<br><br>Between electroacoustic sounds and algorithmic structures, the set questions how memory functions when it is externalized to machines, and whether an emotional experience can continue to exist once it is translated into code.<br><br> In dialogue with the theme “Trust Issues” (Elevate Festival 2025), the performance puts trust, automation, and presence into tension.Performed before Suzanne Ciani Buchla's quadrophonic liveset, it acts as a conceptual threshold between analog synthesis and algorithmic narration.<br> <br>Photo credits: <a href='https://www.clarawildberger.com/' style='color:var(--mac-text); text-decoration:underline;'> © Clara Wildberger</a>", 
+                soundcloudUrl: "https://soundcloud.com/utopixxel/liveset-elevate-festival-060325", 
+                images: ["ele1", "ele2", "ele3","ele4","ele5"] 
+            },
+            { 
+                title: "BORDER", 
+                type: "INSTALLATION", 
+                year: "2025", 
+                desc: "> for projection mapping, perforated wood, fog and ultrasonic speaker<br><br><a href='https://www.researchcatalogue.net/view/3760429/3760430' style='color:var(--mac-text); text-decoration:underline;'>Research Catalogue Article</a><br><br>Border explores the concept of boundaries as both physical and symbolic barriers. The light filtering through the perforations becomes a symbol of cracks in these barriers, allowing some elements to pass while obstructing others. While goods and those with privilege can move through, people often remain trapped behind such divisions. Boundaries, both physical and mental, are frequently depicted as impenetrable; however, as cracks in the surface demonstrate, there are always spaces for passage.<br><br>Border invites reflection on the notion of boundaries as artificial constructs that can be dismantled. Cracks are not signs of weakness but rather opportunities for connection and passage. When individuals conspire together to traverse these fractures, light can pass through, reminding us that borders exist only as long as they are accepted as such.<br><br>Spectators can interact with the installation by physically moving through the space, exploring how the projected words shift and distort based on perspective.<br><br>The installation also makes use of an ultrasonic speaker that creates a sonic beam—a directional sound field where audio can be heard only at a precise point in space. This localized auditory experience adds a further sensory layer to the work, reinforcing its exploration of perceptual boundaries and selective access to information. ", 
+                videoIds: ["hXsanSHNsaU" ],
+                images: null,
+            },
+            { 
+                title: "CMKK V x SMC2025",
+                type: "Live-set", 
+                year: "10/072025", 
+                desc: "> <a href='https://smc25.iem.sh/sessions/off-smc/' style='color:var(--mac-text); text-decoration:underline;'>Link to program </a><br> <br>The 5th iteration of CMKK nights has taken place in Dom Im Berg. It is a very special collaboration together with SMC25 and Institute for Sonic Welfare (IfSW). <br><br> All acts are using number 5 as their reference: 5 channels, 5 sound sources, algorithms guided by number 5 and so on. <br> <br> IfSW Nerd Nights Spatial Sound Events is a project to test, develop and promote spatial sound art by supporting young and established professionals, both locally and internationally, in the exploration and creation of new experimental music. The invited artists develop and perform site-specific compositions/live performances in Dom im Berg with the support of the cultural association Institute for Sonic Welfare.", 
+                videoIds:["aEaAQFWhVxY"] ,
+                hasVideo: true, 
+                images: ["art1", "art2", "art3","art4"] 
+            },
+            { 
+                title: "What if we kissed in the latent space?", 
+                type: "INSTALLATION", 
+                year: "2024", 
+                desc: "> 𝕎ℍ𝔸𝕥 𝕀𝔽 𝕎𝔼 𝕂𝕀𝕊𝕊𝔼𝔻 𝕀ℕ 𝕋ℍ𝔼 𝕃𝔸𝕋𝔼ℕ𝕋 𝕊ℙ𝔸ℂ𝔼? <br><br>An interactive installation that explores the concept of latent space: a compressed, abstract representation of data in machine learning, where potential outcomes coexist without a definitive result. The installation delves into this perpetual state of possibility and transformation, challenging our expectations of finality.<br><br>Inspired by the idea that latent space is a domain of infinite potential rather than finite outcomes, the work reflects the relentless pursuit of desires in human life, where fulfillment is fleeting and new desires constantly emerge in a chaotic manner, morphing into one another without ever arriving at a definitive outcome.<br><br>The title playfully references the meme “What if we kissed in…”, humorously suggesting a shared intimate moment in unconventional places. It invites viewers to a strange and intimate exploration of an abstract, multidimensional computational realm.<br><br>The auditory and visual contents are generated with AI tools, such as StableDiffusion and IRCAM Rave<br><br><br>Inside the exhibition AI TRAGEDY: ESC Medien Kunst Labor - Graz (6-13/09/2024) / MUMUTH Kunstuniversität Graz (02/10/2024)", 
+                videoIds: ["__YWMKfpuhk", "8ju_7pJS0HI"], 
+                
+            },
+            {
+              title: "Live-Set for Ultrablack non-ference of Mille Plateux",
+              type: "AUDIO_VISUAL",
+              year: "2023",
+              desc: `> Played live at Forum Stadtpark in Graz 27/10/23<br><br><b>Description:</b><br>Ultrablackness is a determining force. The outside folding in. Background noise of the thermodynamic disequilibrium. An indifferent un_groundedness, opaque like a heterogeneous mixture or transparent like see-through fluids. Not to be differentiated, but the 0 that defines 1.<br><br>Ultrablackness therefore is not to be confused with the void - emptyness -, but is intrinsically messy. That which messes with the attempt to define, to limit, and territorialize, a dæmonic force subverting the godly order, defying the One-God-Universe. Black noise, unlike the searing buzz of white noise, is barely audible. Black noise traces the quiver of things we fail to perceive.<br><br>Our uchromia: to learn to think from the point of view of Black as what determines color in the last instance rather than what limits it.`,
+              soundcloudUrl: "https://soundcloud.com/utopixxel/liveset-for-ultrablack-non-ference-of-mille-plateux-forum-stadpark",
+              images: ["ultra1","ultra2", "ultra3", "ultra4"]
+            },
+            {
+              title: "CHAOSM - Live at IEM CUBE - 30/01/23 (Binaural)",
+              type: "AUDIO_VISUAL",
+              year: "2023",
+              desc: `> Played live at IEM CUBE in Graz 30/01/23 in 5th order ambisonics, this version is decoded in binaural.<br><br><b>Description:</b><br>Chaos is not a generic and indeterminate mass of matter, but a constantly changing dimension where the speed of the emergence of new determinations leaves no space for the formation of constant elements over time. What defines CHAOSM is a constellation of a-rhytmic patterns and digital errors that moves around the room, a meaningless assemblage of endless sonic perspectives.`,
+              soundcloudUrl: "https://soundcloud.com/utopixxel/chaosm-live-at-iem-cube-300123-binaural",
+
+            },
+            {
+             title: "KLOWNWAVE", 
+             type: "VST/AU Plugin Synth", 
+             year: "2022", 
+             desc: "> AU / VST Plugin synth written in Csound and Cabbage  - <a href='https://github.com/cipp0/KlownWave' style='color:var(--mac-text); text-decoration:underline;'>GitHube Repo</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_KlownWave_macOS.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Apple (Universal)</a> - <a href='https://www.bitnet01.xyz/KlownWave/KernelPanik_Klownwave_Windows.zip' style='color:var(--mac-text); text-decoration:underline;'>Download Windows</a> <br><br>In this long period of pandemic, for about two years now, we have tried to commit our efforts, for something truly stimulating and of which we have always been passionate, and this is how, thanks to the collaboration between KernelPanikSound and BitNet01 collective, we have been able to develop in this time, our virtual synthesizer, VST, with our style and sound timbre that we have called KLOWNWAVE.<br><br>We are excited to introduce this new project to you, and we hope you will share our visionary initiative. KlownWave it's distributed to the public 'by donation', it's open source and hackable<br><br>Features:<br>2 x Wavetable Oscillators<br>6 x Wavetable Set with 16 morphable waves each<br>2 x Analog-like Oscillators (Saw-Ramp-Triangle)<br>2 x FM module with morphable source (between different harmonics in sine waves)<br>1 x White Noise<br>1 x Filter module with envelope and types:<br>TB303-like lowpass filter with resonance<br>Moog-like lowpass filter with resonance<br>Steiner-Parker lowpass filter with resonance<br>Steiner-Parker highpass filter with resonance<br>Steiner-Parker bandpass filter with resonance<br><br> This work is licensed under a GNU GENERAL PUBLIC LICENSE<br>Developed by cipp0 (BitNet01) from an idea of Kernel Panik Sound", 
+             hasVideo: true, 
+             videoIds:["GsDrJaLyziQ"],
+             images: ["inst1", "inst2", "inst3", "inst4", "inst5", "inst6"]
+         },
+            {
+              title: "LEAP INTO THE UNKNOWN",
+              type: "AV Installation",
+              year: "2026",
+              desc: `> Audiovisual installation by Francesco Casanova and Lain Iwakura. World premiere at ORF musikprotokoll 2026 (Supernova), Graz.<br><br>
+Binarity breaks – both/and/neither. Worlds-without-ground. Unknown unknowns. CERN tunnel. Insurgent streets. History buffer. Meme theories. A social machine for undetermined life.<br><br>
+Quantum physics dissolves certainty into probabilities, and reality itself becomes inseparably bound to the informational limits through which it is experienced.<br><br>
+Non-philosophy withdraws from philosophy its grip on ultimate grounds. A philosophy dreamed by the Real.<br><br>
+Uprisings produce time-spaces in which existing social orders lose their inevitability, suspend the given distribution of the possible and, for a moment, let incompatible futures breathe together.<br><br>
+<i>Leap into the Unknown</i> gathers these unstable materials without resolving them. Thought, matter and collective action overwrite one another without origin or permission. The feed becomes a field where particles remember, propaganda dreams, archives hallucinate and failed visions of the future refuse to go extinct. Every intervention edits reality and at the same time corrupts its source code.<br><br>
+Leap – transition into an (N)ontology in which indeterminacy is constitutive. Future as interference, before history knows its name.<br><br>
+<b>Materials:</b> voices of Harrison Prosper, François Laruelle, Karl-Heinz Dellwo, Gabriele Rollnik, <i>One Piece</i>, Peter Weiss <i>Die Ästhetik des Widerstands</i> (BR), Lizzie Borden <i>Born in Flames</i>, Ulrike Meinhof <i>Bambule</i>, Elio Petri <i>La classe operaia va in paradiso</i>, <i>TATORT</i> (ARD), Nikel Pallat <i>Ende offen</i> (WDR), Sergio Zavoli <i>La notte della Repubblica</i> (RAI), Jack Hazan, David Mingay <i>Rude Boy</i>, found footage and more. Recordings at CERN and CERN Audiovisual Media.<br><br>
+Photo credits: © ORF musikprotokoll / M. Gross`,
+              images: ["1","2","3","4","5","6","7","8","9","10","full"]
+            }
+
+        ];
+
+        // Inserimento forzato dei dati dell'archivio all'indice 100
+     projectsData[200] = {
+           title: "Audiovisual Live-Set for APOPHENIA FESTIVAL",
+          type: "AUDIO_VISUAL",
+          year: "2023",
+          desc: `> Played live at Cinema Politeama in Fano 07/12/23<br><br><b>Description:</b>“Apophenia: tendenza a percepire connessioni significanti tra cose non correlate.” Il caos comunicativo che regola la nostra vita quotidiana è rappresentato da infinite sequenze in cui notizie di guerra e scenari apocalittici si alternano a Meme e Reels divertenti. Il rumore comunicativo ovviamente non è una novità nella nostra contemporaneità, ma ciò non cambia il fatto che sia ancora un criterio di riferimento importante per comprendere i gradi di sviluppo e diffusione dell'economia dell’attenzione.<br><br>Il caos non è un insieme generico e indeterminato di materia, ma una dimensione costantemente mutevole in cui la velocità con cui emergono nuove determinazioni non lascia spazio alla formazione di elementi costanti nel tempo. L'arte produce cambiamenti, trasformando la modulazione perpetua del caos in un movimento creativo a livello percettivo.<br><br>Che si tratti di lottare contro il rumore comunicativo, sospendere il meccanismo stimolo-ricompensa derivante dalla mercificazione di ogni aspetto della vita o sabotare la predazione antropica, la delimitazione di uno spazio di resistenza passa attraverso un confronto con il rumore creando un contro-rumore.<br><br>L’Apophenia Festival, organizzato dal collettivo BitNet01 vuole costruire, ospitando il collettivo milanese Otolab, Spazio Ge.Ge di Pesaro e la TKD family, uno spazio collettivo per dare forma al contro-rumore, uno spazio di performance audiovisive, installazioni multimediali, workshop e DJ-sets, all’interno della cornice dello storico Cinema Politeama, alla soglia dei suoi 100 anni di attività, e all’Officina Amaranta sede dell’APS Urobòros Amaranto.`,
+          videoIds: ["oLg3PW9RNBU"],
+        };
+
+        projectsData[201] = {
+          title: "Fluid Node - A-Lumiere",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> Live Electronics performance @ Teatro della Fortuna - Fano (Italy)<br><br>A-Lumiere is an experimental duo formed by Matteo Tomasetti and Francesco Casanova<br><br><b>Description:</b><br>"The amount of binary information produced in the anthropocene can be represented as a multiform fluid in continuous evolution. A liquid 'chaosm' led by creatures from the deepest abyss with metal heads and fiber optic tentacles that carry the immateriality of our existence. The Fluid-node performance aims to represent a sound representation of individual precarious existences that flounder immersed in a historical moment characterized by environmental disasters and global pandemics. Investigating space, time, gestures and the sound landscape through the information technology medium."`,
+          videoIds: ["XWxFRCGw9-U"],
+          soundcloudUrl: "",
+          images: []
+        };
+
+        projectsData[202] = {
+          title: "EU-SAT",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> WebVR online installation selected for the New York City Electroacoustic Music Festival (NYCEMF 2021)<br><br><b>Description:</b><br>This installation / composition aims to be a symbiosis between what is beyond the sky and what we feel on earth. Inspired by "Serenata per un satellite" by Bruno Maderna where we find the elements of a futuristic avant-garde made of experimentation and the dream of space The algorithm parameters are controlled by calculating the SGP trajectories obtained through NASA's TLE, creating an ensemble of seven satellites: ISS, Kestrel, Tempest-D, Cuberrt, Dellingr, Ubakusat and Halosat(...).<br><br>The trajectories of the satellite's orbits are calculated in the future. The data of the future transform and change the sound material in the present, creating a dialectic between what will be and what is. This work is conceived as an open work in continuous evolution.<br><br>It wants to recall an imaginary of a utopia where technology can shape the future according to the needs of everyone in the present, imagining a symbiosis between all natural elements such as the human, the non-human, the earth and space.<br><br><a href='https://www.bitnet01.xyz/EUSAT/' style='color:var(--mac-text); text-decoration:underline;'><b>Demo</b></a>`,
+          videoIds: [],
+          soundcloudUrl: "",
+          images: ["vr1"]
+        };
+
+        projectsData[203] = {
+          title: "Rhizomatic Mutual Jam - SMC2021",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> Networked music performance between Rome and Turin<br><br> Work selected for the live music program of the Sound and Music Computing Conference (SMC 2021) with Giorgio Alloatti, Andrea Reali, Federico Briata and Matteo Tomasetti<br><br><b>Description:</b><br>We are experiencing a reality that until a few months ago we could only trace in some sci-fi movies. The body becomes obsolete, our lives enter a purely cognitive dimension. Networking means creating relationship networks, sharing experiences and ideas, creating(...)contexts to communicate and create artistically so that the artists and public get confused and lose their original meaning.<br><br>The term rhizomatic derives from rhizome which in botany is a particular type of root where any point is connected to any other point in a non-hierarchical way: there is no center, no direction, only concatenations. In philosophy Gilles Deleuze and Felix Guattari place the concept of rhizome at the center of a widespread organizational model capable of describing and changing social and cultural processes.<br><br>For this purpose we have set up two NINJAM servers. NINJAM is a Client/Server software that allows you to play synchronized via the Internet. Any participant can listen to any other participant. Users can also edit his own personal mix as they wish. Since the inherent latency of the Internet prevents true real time synchronization of the jam and playing with latencies of tens of milliseconds is in fact impossible, NINJAM provides a solution by making latency (and the weirdness) much longer.<br><br>Latency in NINJAM is measured in measures, and that's what makes it interesting.`,
+          videoIds: ["E1nn0v9bNiI"],
+        };
+
+        projectsData[204] = {
+          title: "Metamorfosi nel tempo (AV composition)",
+          type: "AUDIO_VISUAL",
+          year: "2021",
+          desc: `> - Music: Giovanni Costantini and Paolo Gatti<br>- Visual: Francesco Casanova <br>- Viola: Luca Sanzò<br><br><br>Selected for the international exhibition <a href='https://cicamuseum.com/circle-2021/' style='color:var(--mac-text); text-decoration:underline;'>“Circle 2021″ at Cica Museum, Gimpo - South Korea </a><br><br><br><br>Description:<br><br>In our memory the sounds and images fall apart and mix, now more alive and present, now more distant and confused. Our memories tell us what it was, but other sounds and other images contaminate them, filtering them and giving them new meanings. Time, inexorable, fragments, recomposes, modifies, re-elaborates our experience, and the more it moves away from us, the more it becomes obscured and transfigured: timbres and colors, as well as melodies and shapes, mix and show themselves to the our minds through each other, in a continuous game of metamorphosis.`,
+        videoIds: ["nbMUlixJAT8?si=AxCXQhVndaCrPgWn"],
+          images: ["met1"]
+        };
+
+        projectsData[205] = {
+          title: "BitNet Laptop Ensemble - Opening Act to Richard Devine",
+          type: "AUDIO_VISUAL",
+          year: "2019",
+          desc: `> The Bitnet Laptop Ensemble is made up of 6 performers and 6 laptops. Shapes, images, synthetic materials, noises, melodic and rhythmic gestures alternate the scene to take the listener to remote digital places. BLE mainly uses programming languages such as Max / Msp, C-Sound, Touch Designer as the primary platform for sound / video synthesis / analysis and software such as Ableton Live for live realization.<br><br>The BLE is: Francesco Casanova, Matteo Tomasetti, Filippo Gualazzi, Gianluca Stefanelli, Luis Braschi and Federico Turchi.`,
+          soundcloudUrl: "https://soundcloud.com/bitnet01/ble-opening-act-to-richard-devine",
+          images: ["ble1"]
+        };
+
+        // ================= SOFTWARE =================
+
+        projectsData[206] = {
+          title: "PoseNetOSC",
+          type: "SOFTWARE",
+          year: "2023",
+          desc: `> Using ML5's PoseNet implementation to track 17 keypoints of the body of a single person using the webcam. These keypoints are then sent via OSC directly to a Max/MSP patch.<br><br><a href='https://github.com/cipp0/PoseNetOSC' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b></a>`,
+          images: ["posenet1"]
+        };
+
+        projectsData[207] = {
+          title: "OSCNet01",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Client for broadcasting of OSC messages via WAN divided into groups (MacOS only)<br>A Project based on Ross Bencina's C++ OSCGroup Library<br><br><a href='https://github.com/cipp0/OSCnet' style='color:var(--mac-text); text-decoration:underline;'>  <b>Repository:</b> </a>`,
+          images: ["osc1"]
+        };
+
+        projectsData[208] = {
+          title: "Mode - Resonator filters bank (Max4live)",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Clone of Mutable Instruments' Rings module. This free MaxForLive device is based on vb.mi.rngs~ OSX external by Volker Böhm, whom I thank so much for porting the original code of Émilie Gillet to Max-MSP.<br><br><a href='https://github.com/cipp0/Mode-Rings' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b></a>`,
+          images: ["mode1"]
+        };
+
+        projectsData[209] = {
+          title: "Aether - meta-granular synthesizer with gesture control",
+          type: "SOFTWARE",
+          year: "2020",
+          desc: `> Live electronics patch that features a microtonal/random arpeggiator from 1 to 32 steps, an oscillator with basic waveforms (sine wave, triangle wave, square wave and white noise) with a MIDI keyboard control to select the center frequency, an envelope to model the sound produced by the oscillator, a real-time sampling granulator, a series of filters with the type of decay and quantity chosen by the user, an audio mixer to control the streams of the various channels, a reverb with various parameters implemented, a gesture control, based on the webcam where the user can change the parameters of the granulator.`,
+          videoIds: ["UKawpZqUd2w"],
+          images: ["aether1"]
+        };
+
+        projectsData[210] = {
+          title: "Nube - Texture Synthesizer (Max4live)",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> Clone of the 'Clouds' module by Mutable Instruments. This free MaxForLive device was made using the "vb.mi.clds~" OSX external by Volker Böhm, whom I thank so much for porting the original code of Émilie Gillet to Max-MSP.<br><br><a href='https://github.com/cipp0/Nube_Texture_Synth' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b> </a>`,
+          videoIds: ["2g5ej1LG5L4"],
+          images: ["nube1"]
+        };
+
+        projectsData[211] = {
+          title: "AS29 Studio - software",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> The AS29 system is a new studio monitor speaker system with different multichannel configurations from 2.1 to 7.1.4.<br><br>AS29 is a premium product entirely made in Italy supplied with a software application for Windows and Mac OSX necessary to control and access the countless functions available: AS29 Studio.<br><br><b>Links:</b><br><a href='https://www.audiofactory.it' style='color:var(--mac-text); text-decoration:underline;'>Audiofactory</a><br><a href='https://www.as29studiomonitor.com' style='color:var(--mac-text); text-decoration:underline;'>AS29 Studio Monitor</a>`,
+          images: ["as291"]
+        };
+
+        projectsData[212] = {
+          title: "Tropical Additive Synthesis",
+          type: "SOFTWARE",
+          year: "",
+          desc: `> Additive synthesizer using tropical algebra in CsoundQT based on the work of Giorgio Sancristoforo and Cristiano Bocci.<br><br>Additive synthesis equations are transformed using tropical addition (⊕) and tropical multiplication (⊗). The algorithm uses: a⊕b := min{a,b} ; a⊗b := a+b<br><br><a href='https://github.com/cipp0/TropicalAdditiveSynth' style='color:var(--mac-text); text-decoration:underline;'><b>Repository:</b> </a>`,
+          images: ["tropi1"]
+        };
+
+        // --- BOOT SEQUENCE ---
+        const bootScreen = document.getElementById('boot-sequence');
+        const mainWindow = document.getElementById('main-content');
+        const bootLines = ["Loading profile...", "Connecting to API...", "System ready."];
+        let lineIndex = 0;
+        function runBootSequence() {
+            if (lineIndex < bootLines.length) {
+                const div = document.createElement('div');
+                div.textContent = bootLines[lineIndex];
+                div.style.marginBottom = '8px';
+                bootScreen.appendChild(div);
+                lineIndex++;
+                setTimeout(runBootSequence, 300);
+            } else {
+                setTimeout(() => {
+                    bootScreen.style.opacity = '0';
+                    bootScreen.style.pointerEvents = 'none';
+                }, 600);
+            }
+        }
+        runBootSequence();
+
+        // --- PROJECT MODAL LOGIC (MAIN SELECTED PROJECTS) ---
+        const modal = document.getElementById('project-modal');
+        const closeBtn = document.getElementById('modal-close');
+        const closeText = document.getElementById('modal-close-text');
+        const mTitle = document.getElementById('modal-project-title');
+        const mMeta = document.getElementById('modal-project-meta');
+        const mDesc = document.getElementById('modal-project-desc');
+        const mGallery = document.getElementById('modal-gallery-content');
+
+        function openProject(index) {
+    const data = projectsData[index];
+
+    mTitle.textContent = data.title;
+    mMeta.textContent = `> TYPE: ${data.type} // YEAR: ${data.year} // ID: #${1000 + index}`;
+    mDesc.innerHTML = data.desc;
+    mGallery.innerHTML = "";
+
+    const galleryWrapper = document.createElement('div');
+    galleryWrapper.className = 'gallery-grid';
+
+    // --- LOGICA YOUTUBE (MULTIPLA) ---
+    if (data.videoIds && data.videoIds.length > 0) {
+        data.videoIds.forEach(id => {
+            const vidDiv = document.createElement('div');
+            vidDiv.className = "gallery-item full-width-media";
+            vidDiv.innerHTML = `
+                <h3>> VIDEO_PREVIEW.mp4</h3>
+                <iframe
+                    style="height: 450px;"
+                    src="https://www.youtube.com/embed/${id}?controls=0"
+                    frameborder="0"
+                    allowfullscreen>
+                </iframe>`;
+            galleryWrapper.appendChild(vidDiv);
+        });
+    }
+
+    // --- LOGICA SOUNDCLOUD ---
+    else if (data.soundcloudUrl) {
+        const scDiv = document.createElement('div');
+        scDiv.className = "gallery-item full-width-media";
+        scDiv.innerHTML = `
+            <h3>> AUDIO_PREVIEW.mp3</h3>
+            <iframe
+                style="height: 450px;"
+                src="https://w.soundcloud.com/player/?url=${encodeURIComponent(data.soundcloudUrl)}&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=true"
+                frameborder="no"
+                allow="autoplay">
+            </iframe>`;
+        galleryWrapper.appendChild(scDiv);
+    }
+
+    // --- LOGICA EMBED (Instagram ecc.) ---
+    if (data.embeds && data.embeds.length > 0) {
+        data.embeds.forEach(embed => {
+            if (embed.type === "instagram") {
+                const igDiv = document.createElement('div');
+                igDiv.className = "gallery-item full-width-media";
+                igDiv.innerHTML = `
+                    <h3>> INSTAGRAM_PREVIEW.html</h3>
+                    <iframe
+                        src="${embed.url}"
+                        style="width:100%; height:720px;"
+                        frameborder="0"
+                        scrolling="no"
+                        allowtransparency="true">
+                    </iframe>`;
+                galleryWrapper.appendChild(igDiv);
+            }
+        });
+    }
+
+    // --- LOGICA IMMAGINI ---
+    if (data.images) {
+        const projectId = parseInt(index) + 1;
+
+        data.images.forEach((imgName, i) => {
+            const imgDiv = document.createElement('div');
+            // "full" = a tutta larghezza, senza ritaglio quadrato
+            imgDiv.className = imgName === "full" ? "gallery-item full-width-media" : "gallery-item grid-image";
+
+            const imageNum = i + 1;
+            const imagePath = `./media/projects/${projectId}/${imageNum}.jpg`;
+
+            imgDiv.innerHTML = `
+                <h3>> IMAGE_PREVIEW_0${imageNum}.jpg</h3>
+                <a href="${imagePath}" target="_blank" class="img-link-wrapper" title="Open Image">
+                    <img src="${imagePath}">
+                </a>`;
+
+            galleryWrapper.appendChild(imgDiv);
+        });
+    }
+
+    mGallery.appendChild(galleryWrapper);
+    modal.classList.add('active');
+}
+
+        function closeModal() { modal.classList.remove('active'); }
+
+        // Listener globale per TUTTI gli elementi li con classe file-list
+        document.querySelectorAll('.file-list li').forEach(li => {
+            li.addEventListener('click', (e) => {
+                // Fermo la propagazione per evitare conflitti strani
+                e.stopPropagation();
+
+                // Se l'elemento cliccato è dentro un link <a>, non aprire il modal
+                if(li.querySelector('a')) return;
+                
+                const index = li.getAttribute('data-index');
+                if(index !== null) {
+                    // Se stiamo aprendo un progetto dalla modale All Projects, chiudi prima la modale All Projects
+                    if(document.getElementById('all-projects-modal').classList.contains('active')) {
+                         document.getElementById('all-projects-modal').classList.remove('active');
+                    }
+
+                    // Controlla se è l'archivio (100) o un progetto selezionato
+                    if(index == "100") {
+                        openArchiveProject(100);
+                    } else {
+                        openProject(parseInt(index));
+                    }
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+        closeText.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+
+        // --- ARCHIVE PROJECT MODAL LOGIC (NEW) ---
+        const archiveModal = document.getElementById('archive-project-modal');
+        const archiveCloseBtn = document.getElementById('archive-project-close');
+        const archiveCloseText = document.getElementById('archive-project-close-text');
+        const aTitle = document.getElementById('archive-project-title');
+        const aMeta = document.getElementById('archive-project-meta');
+        const aDesc = document.getElementById('archive-project-desc');
+        const aGallery = document.getElementById('archive-gallery-content');
+
+        function openArchiveProject(index) {
+            const data = projectsData[index];
+            aTitle.textContent = data.title;
+            aMeta.textContent = `> TYPE: ${data.type} // YEAR: ${data.year} // ID: #ARCHIVE_${index}`;
+            aDesc.innerHTML = data.desc; 
+            aGallery.innerHTML = ""; 
+            
+            const galleryWrapper = document.createElement('div');
+            galleryWrapper.className = 'gallery-grid';
+
+            // Logica semplificata per l'archivio
+            if (data.videoIds && data.videoIds.length > 0) {
+                data.videoIds.forEach(id => {
+                    const vidDiv = document.createElement('div');
+                    vidDiv.className = "gallery-item full-width-media";
+                    vidDiv.innerHTML = `<h3>> VIDEO_PREVIEW.mp4</h3><iframe style="height: 450px;" src="https://www.youtube.com/embed/${id}?controls=0" frameborder="0" allowfullscreen></iframe>`;
+                    galleryWrapper.appendChild(vidDiv);
+                });
+            } 
+
+            if (data.images) {
+                const projectId = parseInt(index) + 1;
+                
+                data.images.forEach((imgName, i) => {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = "gallery-item grid-image";
+                    
+                    const imageNum = i + 1;
+                    // Se è l'index di esempio 100, usa una path diversa per non rompere il layout
+                    let imagePath = (index == 100) ? `./media/projects/1/${imageNum}.jpg` : `./media/projects/${projectId}/${imageNum}.jpg`;
+                    
+                    imgDiv.innerHTML = `<h3>> IMAGE_PREVIEW_0${imageNum}.jpg</h3><a href="${imagePath}" target="_blank" class="img-link-wrapper" title="Open Image"><img src="${imagePath}"></a>`;
+                    
+                    galleryWrapper.appendChild(imgDiv);
+                });
+            }
+            
+            aGallery.appendChild(galleryWrapper);
+            archiveModal.classList.add('active');
+        }
+
+        function closeArchiveModal() {
+            archiveModal.classList.remove('active');
+        }
+
+        // Listener per chiudere il modale Archivio
+        archiveCloseBtn.addEventListener('click', closeArchiveModal);
+        archiveCloseText.addEventListener('click', closeArchiveModal);
+        archiveModal.addEventListener('click', (e) => { if (e.target === archiveModal) closeArchiveModal(); });
+
+        // --- ALL PROJECTS MODAL LOGIC ---
+        const allProjectsBtn = document.getElementById('btn-all-projects');
+        const allProjectsModal = document.getElementById('all-projects-modal');
+        const allProjectsCloseBtn = document.getElementById('all-projects-close');
+        const allProjectsCloseText = document.getElementById('all-projects-close-text');
+
+        allProjectsBtn.addEventListener('click', () => {
+            allProjectsModal.classList.add('active');
+        });
+
+        function closeAllProjectsModal() {
+            allProjectsModal.classList.remove('active');
+        }
+
+        allProjectsCloseBtn.addEventListener('click', closeAllProjectsModal);
+        allProjectsCloseText.addEventListener('click', closeAllProjectsModal);
+        allProjectsModal.addEventListener('click', (e) => { if (e.target === allProjectsModal) closeAllProjectsModal(); });
+
+
+        // --- HISTORY MODAL LOGIC ---
+        const historyModal = document.getElementById('history-modal');
+        const openHistoryBtn = document.getElementById('open-history-btn');
+        const historyCloseBtn = document.getElementById('history-close-btn');
+        const historyCloseText = document.getElementById('history-close-text');
+
+        openHistoryBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            historyModal.classList.add('active');
+        });
+
+        function closeHistoryModal() {
+            historyModal.classList.remove('active');
+        }
+
+        historyCloseBtn.addEventListener('click', closeHistoryModal);
+        historyCloseText.addEventListener('click', closeHistoryModal);
+        historyModal.addEventListener('click', (e) => { if (e.target === historyModal) closeHistoryModal(); });
+
+
+        // --- ANCHOR SCROLL & HOVER ---
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                const targetSection = document.querySelector(this.getAttribute('href'));
+                if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        document.querySelectorAll('.hover-trigger').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if(el.tagName === 'A' || el.id === 'open-history-btn' || el.id === 'btn-all-projects') return;
+                const originalBg = window.getComputedStyle(el).backgroundColor;
+                el.style.backgroundColor = '#33ff33';
+                el.style.color = '#000000';
+                setTimeout(() => {
+                    el.style.backgroundColor = originalBg;
+                    el.style.color = '';
+                }, 100);
+            });
+        });
+
+        /* =========================================
+           PART 2: 3D AUDIO SYSTEM
+           ========================================= */
+
+        let scene, camera, renderer, particles, geometry;
+        let audioContext, analyser, dataArray, audioTexture;
+        let clock;
+        let isAudioInit = false;
+        let time = 0;
+        let mouseX = 0, mouseY = 0;
+        let targetRotationX = 0, targetRotationY = 0;
+        let scrollY = 0;
+
+        const CONFIG = {
+            colorBase: new THREE.Color(0x051a05), 
+            colorHigh: new THREE.Color(0x33ff33), 
+            colorPeak: new THREE.Color(0xccffcc), 
+            zoomStart: 60,
+            zoomEnd: 35
+        };
+
+        init();
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); 
+            scene.fog = new THREE.FogExp2(0x000000, 0.02); 
+            
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = CONFIG.zoomStart;
+            camera.position.x = 0;
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            clock = new THREE.Clock();
+            loadGeometry();
+            window.addEventListener('resize', onResize);
+            setupMouseInteraction();
+            animate();
+        }
+
+        function loadGeometry() {
+            const loader = new THREE.STLLoader();
+            loader.load('./model.stl', function (g) { processGeometry(g); }, 
+            function (xhr) { /* Progress */ }, 
+            function (error) {
+                const fg = new THREE.TorusKnotGeometry(4, 1.2, 200, 32);
+                processGeometry(fg);
+            });
+        }
+
+        function processGeometry(rawGeometry) {
+            rawGeometry.computeVertexNormals(); rawGeometry.center(); rawGeometry.scale(1, 1, 1); geometry = rawGeometry;
+            const vertexShader = `
+                uniform float uTime; uniform sampler2D uAudioData; uniform float uAudioIntensity; attribute float size; varying vec3 vColor; varying float vAudio;
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+                vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+                float snoise(vec3 v) {
+                    const vec2 C = vec2(1.0/6.0, 1.0/3.0) ; const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                    vec3 i = floor(v + dot(v, C.yyy) ); vec3 x0 = v - i + dot(i, C.xxx) ; vec3 g = step(x0.yzx, x0.xyz);
+                    vec3 l = 1.0 - g; vec3 i1 = min( g.xyz, l.zxy ); vec3 i2 = max( g.xyz, l.zxy );
+                    vec3 x1 = x0 - i1 + C.xxx; vec3 x2 = x0 - i2 + C.yyy; vec3 x3 = x0 - D.yyy;
+                    i = mod289(i); vec4 p = permute( permute( permute( i.z + vec4(0.0, i1.z, i2.z, 1.0 )) + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                    float n_ = 0.142857142857; vec3 ns = n_ * D.wyz - D.xzx;
+                    vec4 j = p - 49.0 * floor(p * ns.z * ns.z); vec4 x_ = floor(j * ns.z); vec4 y_ = floor(j - 7.0 * x_ );
+                    vec4 x = x_ *ns.x + ns.yyyy; vec4 y = y_ *ns.x + ns.yyyy; vec4 h = 1.0 - abs(x) - abs(y);
+                    vec4 b0 = vec4( x.xy, y.xy ); vec4 b1 = vec4( x.zw, y.zw );
+                    vec4 s0 = floor(b0)*2.0 + 1.0; vec4 s1 = floor(b1)*2.0 + 1.0;
+                    vec4 sh = -step(h, vec4(0.0)); vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ; vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                    vec3 p0 = vec3(a0.xy,h.x); vec3 p1 = vec3(a0.zw,h.y); vec3 p2 = vec3(a1.xy,h.z); vec3 p3 = vec3(a1.zw,h.w);
+                    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+                    p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0); m = m * m;
+                    return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+                }
+                void main() {
+                    vec3 newPos = position; float noiseVal = snoise(position * 0.3 + uTime * 0.1);
+                    float audioLookup = noiseVal * 0.5 + 0.5; float audioData = texture2D(uAudioData, vec2(audioLookup, 0.0)).r;
+                    float smoothedAudio = audioData * uAudioIntensity; float timeWobble = sin(uTime * 2.0 + position.y) * 0.05;
+                    newPos += normal * (smoothedAudio + timeWobble); vAudio = smoothedAudio;
+                    vec3 baseColor = vec3(0.0, 0.3, 0.0); vec3 midColor = vec3(0.0, 1.0, 0.0); vec3 peakColor = vec3(0.5, 1.0, 0.5);
+                    if(vAudio > 0.6) { vColor = mix(midColor, peakColor, (vAudio - 0.6) * 2.5); } else { vColor = mix(baseColor, midColor, vAudio * 1.6); }
+                    vec4 mvPosition = modelViewMatrix * vec4(newPos, 1.0); gl_Position = projectionMatrix * mvPosition;
+                    gl_PointSize = (200.0 / -mvPosition.z) * (1.5 + vAudio * 2.0);
+                }
+            `;
+            const fragmentShader = `varying vec3 vColor; void main() { vec2 coord = gl_PointCoord - vec2(0.5); float dist = length(coord); if (dist > 0.5) discard; float alpha = 1.0 - (dist * 2.0); alpha = pow(alpha, 2.0); gl_FragColor = vec4(vColor, alpha); }`;
+            const material = new THREE.ShaderMaterial({
+                uniforms: { uTime: { value: 0 }, uAudioData: { value: null }, uAudioIntensity: { value: 1.0 } },
+                vertexShader: vertexShader, fragmentShader: fragmentShader, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+            });
+            particles = new THREE.Points(geometry, material); particles.position.x = 8; particles.rotation.z = Math.PI / 4; scene.add(particles);
+        }
+
+        function setupAudio() {
+            if (isAudioInit) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext();
+            analyser = audioContext.createAnalyser(); 
+            analyser.fftSize = 512;
+            const track = audioContext.createMediaElementSource(document.getElementById('audio-sample'));
+            track.connect(analyser); 
+            analyser.connect(audioContext.destination);
+            const bufferLength = analyser.frequencyBinCount; 
+            dataArray = new Uint8Array(bufferLength);
+            audioTexture = new THREE.DataTexture(dataArray, bufferLength, 1, THREE.RedFormat);
+            if(particles) { particles.material.uniforms.uAudioData.value = audioTexture; } 
+            isAudioInit = true;
+        }
+
+        const musicToggle = document.getElementById('music-toggle');
+        const audioSample = document.getElementById('audio-sample');
+        
+        musicToggle.addEventListener('click', () => {
+            if(!isAudioInit) {
+                setupAudio();
+                if(audioContext.state === 'suspended') audioContext.resume();
+                audioSample.volume = 0.5;
+                audioSample.play();
+                musicToggle.classList.add('active');
+            } else {
+                if(audioSample.paused) {
+                    audioSample.play();
+                    if(audioContext.state === 'suspended') audioContext.resume();
+                    musicToggle.classList.add('active');
+                } else {
+                    audioSample.pause();
+                    musicToggle.classList.remove('active');
+                }
+            }
+        });
+
+        function setupMouseInteraction() {
+            document.addEventListener('mousemove', (e) => { 
+                mouseX = (e.clientX - window.innerWidth / 2) * 0.0005; 
+                mouseY = (e.clientY - window.innerHeight / 2) * 0.0005; 
+            });
+            window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+        }
+
+        function onResize() { 
+            camera.aspect = window.innerWidth / window.innerHeight; 
+            camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock ? clock.getDelta() : 0; 
+            time += delta;
+            
+            const scrollPercent = Math.min(1, scrollY / (document.body.scrollHeight - window.innerHeight));
+            const targetZ = CONFIG.zoomStart - (scrollPercent * (CONFIG.zoomStart - CONFIG.zoomEnd));
+            camera.position.z += (targetZ - camera.position.z) * 0.1; 
+            camera.lookAt(8, 0, 0);
+            
+            if (isAudioInit && analyser) { 
+                analyser.getByteFrequencyData(dataArray); 
+                audioTexture.image.data = dataArray; 
+                audioTexture.needsUpdate = true; 
+            }
+            if (particles) {
+                particles.material.uniforms.uTime.value = time; 
+                targetRotationY += 0.001;
+                const scrollRotation = scrollY * 0.0005;
+                particles.rotation.y += 0.05 * ((targetRotationY + scrollRotation + mouseX) - particles.rotation.y);
+                particles.rotation.x += 0.05 * (mouseY - particles.rotation.x);
+            }
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
